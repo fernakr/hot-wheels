@@ -2,51 +2,65 @@ import { createRoot } from 'react-dom/client'
 import React, { useRef, useState } from 'react'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
+import { PlaneGeometry } from 'three/src/geometries/PlaneGeometry.js';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 
-import font from 'three/examples/fonts/helvetiker_regular.typeface.json'
+//import font from 'three/examples/fonts/helvetiker_regular.typeface.json'
 
 import { Canvas, useFrame, useLoader, extend } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three';
-
+import myFont from './helvetiker_regular.typeface.json';
 
 const ModelViewer = ({ model, position }) => {    
     const gltf = useLoader(GLTFLoader, model)
     // apply position to model
 
-    return <primitive object={gltf.scene} position={ position } />
+    return <primitive object={gltf.scene} position={position} />
  }
 
 const Logo = () => {
+    let fontLoader = new FontLoader();
+    let taglineFont = fontLoader.parse(myFont);
+
     extend({TextGeometry});
     return (<>
          <ModelViewer
             model="./assets/models/hotwheels.gltf"
-            position={[0, 0, -3]}
+            position={[0, -1.5, -3]}
         />
         {/* Add text  */}
-        <mesh position={[0, 0, -3]}>
-            <textGeometry attach="geometry" args={['Hot Wheels', { font: font}]} />
+        <mesh position={[0, -2, -3]}>
+            { taglineFont && 
+                <mesh position={[-1,6,-8]}>
+                    <textGeometry attach="geometry" args={[`"We'll make a car\n out of anything!!"`, { font: taglineFont, size: 0.4, height: .01}]} />
+                    <meshStandardMaterial attach="material" color="white" />
+                </mesh>
+            }
             <meshStandardMaterial attach="material" color="white" />
         </mesh>
 
     </>) 
 };
 
-const Car = ({ position }) => {
-    const wheelsPosition = [...position];
-    const frontWheelsPosition = [...position];
-    // frontWheelsPosition[0] = position[0] + 1;
-    // frontWheelsPosition[1] = position[1] + 1;
-    frontWheelsPosition[2] = position[2] + 10;
+const Car = ({ position, rotation }) => {
+
+    return (
+        <group rotation={ rotation } position={ position }>
+            <Wheels />
+            <Body  />
+        </group>
+    )
+};
+
+const Wheels = () => {
     return (<>
-        <Wheels position={wheelsPosition}/>
-        <Wheels position={frontWheelsPosition}/>
-        <Body  position={position}/>
+        <BackWheels />
+        <FrontWheels position={[0,0,3] }/>
     </>)
 };
 
-const Wheels = ({ position }) => {
+const BackWheels = ({ position }) => {
     return (<>
         <ModelViewer
             model="./assets/models/wheels.gltf"
@@ -54,6 +68,17 @@ const Wheels = ({ position }) => {
         />
     </>)
 };
+
+
+const FrontWheels = ({ position }) => {
+    return (<>
+        <ModelViewer
+            model="./assets/models/wheels-front.gltf"
+            position={ position }
+        />
+    </>)
+};
+
 
 const Body = ({position}) => {
     return (<>
@@ -63,6 +88,17 @@ const Body = ({position}) => {
         />
     </>)
 };
+
+const Ground = () => {
+    extend({PlaneGeometry})
+    return (<>
+        <mesh rotation={[0,Math.PI/2,0]} position={[0,0,0]}>
+            
+            <planeGeometry attach="geometry" args={[100,100]} />
+            <meshStandardMaterial attach="material" color="white" />
+        </mesh>
+    </>)
+}
 
 const Scene = () => {
     // set background color of scene    
@@ -83,7 +119,8 @@ const Scene = () => {
         <ambientLight intensity={0.3} />        
         <Logo/>
 
-        <Car position={[0,0,-10]}/>
+        <Car position={[0,-3,-8]} rotation={[0,-Math.PI/9,0]}/>
+        <Ground/>
 
       </>
     );
