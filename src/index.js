@@ -62,11 +62,11 @@ const Ground = () => {
 const Base = () => {
     extend({CylinderGeometry})
     return (<>
-        <mesh receiveShadow position={[0,-4,-9.85]} rotation={ [0,0,0] }  >
+        <mesh receiveShadow position={[0,-5,-11.85]} rotation={ [0,0,0] }  >
             
             <shadowMaterial transparent opacity={0.4} />
-            <cylinderGeometry attach="geometry" args={[5,5,0.4,50]} />
-            <meshLambertMaterial color="#666" roughness={0} metalness={1} />
+            <cylinderGeometry attach="geometry" args={[6,6,0.4,50]} />
+            <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color="#555" roughness={0}/>
         </mesh>
     </>)
 };
