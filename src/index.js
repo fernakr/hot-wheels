@@ -12,11 +12,13 @@ import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three';
 import myFont from './helvetiker_regular.typeface.json';
 
-const ModelViewer = ({ model, position }) => {    
+
+
+const ModelViewer = ({ model, position, rotation, clickHandler }) => {    
     const gltf = useLoader(GLTFLoader, model)
     // apply position to model
 
-    return <primitive object={gltf.scene} position={position} />
+    return <primitive onClick={ clickHandler } object={gltf.scene} position={position} rotation={rotation} />
  }
 
 const Logo = () => {
@@ -27,7 +29,8 @@ const Logo = () => {
     return (<>
          <ModelViewer
             model="./assets/models/hotwheels.gltf"
-            position={[0, -1.5, -3]}
+            position={[0, 0, -3]}
+            rotation={[-Math.PI/10,0,0]}
         />
         {/* Add text  */}
         <mesh position={[0, -2, -3]}>
@@ -43,12 +46,12 @@ const Logo = () => {
     </>) 
 };
 
-const Car = ({ position, rotation }) => {
+const Car = ({ position, rotation, body, setBody }) => {
 
     return (
         <group rotation={ rotation } position={ position }>
             <Wheels />
-            <Body  />
+            <Body body={ body} setBody={ setBody} />
         </group>
     )
 };
@@ -79,11 +82,29 @@ const FrontWheels = ({ position }) => {
     </>)
 };
 
+let body;
 
-const Body = ({position}) => {
+const changeBody = (currBody) => {
+    let bodies = ['jordan','heart'];
+    if (currBody) {
+        // remove current body from array
+        bodies = bodies.filter((b) => b !== currBody);
+    }
+
+    let body = bodies[Math.floor(Math.random() * bodies.length)];
+    return body;
+}
+
+// on click change body
+
+
+const Body = ({position, body, setBody}) => {    
+
+
     return (<>
         <ModelViewer
-            model="./assets/models/body.gltf"
+            clickHandler = { () => setBody(changeBody(body)) }
+            model={ `/assets/models/body/${ body }.gltf` }
             position={position}
         />
     </>)
@@ -92,15 +113,18 @@ const Body = ({position}) => {
 const Ground = () => {
     extend({PlaneGeometry})
     return (<>
-        <mesh rotation={[0,Math.PI/2,0]} position={[0,0,0]}>
+        <mesh position={[0,0,-12]}>
             
             <planeGeometry attach="geometry" args={[100,100]} />
-            <meshStandardMaterial attach="material" color="white" />
+            <meshPhongMaterial attach="material" color="#000066" />
         </mesh>
     </>)
 }
 
 const Scene = () => {
+
+    
+    const [body, setBody] = useState(changeBody());
     // set background color of scene    
   
     useFrame(() => {
@@ -111,15 +135,15 @@ const Scene = () => {
   
     return (
       <>
-        <pointLight position={[0, 0, -3]} intensity={1} />
-        <pointLight position={[0, -10, -10]} intensity={1} />
+        <pointLight position={[0, 10, 10]} intensity={1} />
+        <pointLight position={[10, -10, 10]} intensity={1} />
         <OrbitControls />        
         {/* <axesHelper /> */}
         {/* <gridHelper /> */}
         <ambientLight intensity={0.3} />        
         <Logo/>
 
-        <Car position={[0,-3,-8]} rotation={[0,-Math.PI/9,0]}/>
+        <Car setBody={ setBody } body={ body } position={[0,-3,-8]} rotation={[0,-Math.PI/9,0]}/>
         <Ground/>
 
       </>
@@ -129,9 +153,9 @@ const Scene = () => {
   
 
 createRoot(document.getElementById('root')).render(
-  <Canvas  camera={{ position: [0, 0, 5], fov: 75 }}
+  <Canvas  camera={{ position: [0, 0, 1], fov: 75 }}
     onCreated={({ gl }) => {
-        gl.setClearColor(new THREE.Color(0x0000ff));
+        gl.setClearColor(new THREE.Color(0x0000cc));
     }}>
      <Scene />
   </Canvas>,
