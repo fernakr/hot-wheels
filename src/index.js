@@ -1,5 +1,6 @@
 import { createRoot } from 'react-dom/client'
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, Suspense } from 'react'
+import { Bloom, DepthOfField, EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { PlaneGeometry } from 'three/src/geometries/PlaneGeometry.js';
@@ -30,19 +31,18 @@ const Logo = () => {
     return (<>
          <ModelViewer
             model="./assets/models/hotwheels.gltf"
-            position={[0, 0, -7.5]}
-            rotation={[0,0,0]}
+            position={[0, 0, -8]}
+            rotation={[Math.PI/20,0,0]}
         />
         {/* Add text  */}
-        <mesh position={[0, -2, -3]}>
+        
             { taglineFont && 
-                <mesh position={[-1,5.7,-8.5]}>
+                <mesh position={[-1,3,-7]}>
                     <textGeometry attach="geometry" args={[`"We'll make a car\n out of anything!!"`, { font: taglineFont, size: 0.7, height: .06}]} />
                     <meshStandardMaterial attach="material" color="white" />
                 </mesh>
             }
-            <meshStandardMaterial attach="material" color="white" />
-        </mesh>
+            
 
     </>) 
 };
@@ -64,8 +64,8 @@ const Base = () => {
     return (<>
         <mesh receiveShadow position={[0,-5,-11.85]} rotation={ [0,0,0] }  >
             
-            <shadowMaterial transparent opacity={0.4} />
-            <cylinderGeometry attach="geometry" args={[6,6,0.4,50]} />
+            <shadowMaterial opacity={1} />
+            <cylinderGeometry attach="geometry" args={[6,6.25,0.4,50,2]} />
             <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color="#555" roughness={0}/>
         </mesh>
     </>)
@@ -85,14 +85,16 @@ const Configurator = () => {
         )
     };
 
-    const Axel = () => {
+    const Axel = ({ position }) => {
         extend({CylinderGeometry})
         return (<>
-            <mesh position={[0,1,-2]} rotation={ [0,0,Math.PI/2] }>
-                
-                <cylinderGeometry attach="geometry" args={[0.05,0.05,4]} />
-                <meshLambertMaterial attach="material" color="white" roughness={0} metalness={0.1} />
-            </mesh>
+            <group position={ position }>
+                <mesh position={[0,1,-2]}  rotation={ [0,0,Math.PI/2] }>
+                    
+                    <cylinderGeometry attach="geometry" args={[0.05,0.05,4]} />
+                    <meshLambertMaterial attach="material" color="white" roughness={0} metalness={0.1} />
+                </mesh>
+            </group>
         </>)
     }
             
@@ -107,7 +109,7 @@ const Configurator = () => {
     const BackWheels = ({ position }) => {
         return (<>
             <group position={ position }>
-                <Axel />
+                <Axel position={ position }/>
                 <ModelViewer
                     model="./assets/models/wheels.gltf"                
                 />
@@ -118,9 +120,10 @@ const Configurator = () => {
 
     const FrontWheels = ({ position, scale }) => {
         return (<>
-            <group position={ position } scale={ scale }>
+            <group position={ position } >
                 <Axel/>
                 <ModelViewer
+                    scale={ scale }
                     model="./assets/models/wheels-front.gltf"                                
                 />
             </group>
@@ -197,10 +200,17 @@ createRoot(document.getElementById('root')).render(
     camera={{ position: [0, 0, 0], fov: 80 }}
     onCreated={({ gl }) => {
         gl.setClearColor(new THREE.Color(0x0000cc));
-    }}>
+    }}>        
+     <Scene />
+     
+     <EffectComposer>
+        {/* <DepthOfField focusDistance={0} focalLength={0.02} bokehScale={2} height={480} /> */}
+        {/* <Bloom luminanceThreshold={0} luminanceSmoothing={0.3} height={1000} />         */}
+        <Vignette eskil={false} offset={0.1} darkness={1.1} />
+      </EffectComposer>
+
      <SoftShadows size= {{ value: 25, min: 0, max: 100 }}
         focus= {{ value: 0, min: 0, max: 2 }}
         samples= {{ value: 10, min: 1, max: 20, step: 1 }} />
-     <Scene />
   </Canvas>,
 )

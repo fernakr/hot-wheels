@@ -6,9 +6,11 @@
   "dependencies": {
     "@react-three/drei": "^9.78.0",
     "@react-three/fiber": "^8.13.4",
+    "@react-three/postprocessing": "^2.14.13",
     "@types/three": "^0.152.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-postprocessing": "^1.4.0",
     "react-scripts": "^5.0.1",
     "three": "^0.154.0"
   },
