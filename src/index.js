@@ -14,7 +14,7 @@ import { OrbitControls, SoftShadows } from '@react-three/drei'
 import * as THREE from 'three';
 import myFont from './flash_rogers.typeface.json';
 
-
+let bodies = ['jordan','heart','kitten','nugget','torso'];
 
 const ModelViewer = ({ model, position, rotation, scale, clickHandler }) => {    
     const gltf = useLoader(GLTFLoader, model)
@@ -38,7 +38,7 @@ const Logo = () => {
         
             { taglineFont && 
                 <mesh position={[-1,3,-7]}>
-                    <textGeometry attach="geometry" args={[`"We'll make a car\n out of anything!!"`, { font: taglineFont, size: 0.7, height: .06}]} />
+                    <textGeometry attach="geometry" args={[`"We'll make a car\n out of anything!!"`, { font: taglineFont, size: 0.7, height: .01}]} />
                     <meshStandardMaterial attach="material" color="white" />
                 </mesh>
             }
@@ -72,7 +72,7 @@ const Base = () => {
 };
 
 const Configurator = () => {
-    let bodies = ['jordan','heart','kitten','nugget','torso'];
+    
     const [body, setBody] = useState('jordan');
         
     const Car = ({ position, rotation, body, setBody }) => {
@@ -164,6 +164,17 @@ const Configurator = () => {
     )
 }
 
+const ModelPreload = () => {
+    return bodies.forEach((body) => {
+        return (
+            <ModelViewer
+                model={ `/assets/models/body/${ body }.gltf` }
+            />
+        )
+    });
+}
+
+
 const Scene = () => {
         
     // set background color of scene    
@@ -188,6 +199,7 @@ const Scene = () => {
         <Ground/>
 
         <Configurator/>
+        <ModelPreload/>
       </>
     );
   };
