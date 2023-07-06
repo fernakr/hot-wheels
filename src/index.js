@@ -2,9 +2,12 @@ import { createRoot } from 'react-dom/client'
 import React, { useRef, useState, Suspense } from 'react'
 import { Bloom, DepthOfField, EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { PlaneGeometry } from 'three/src/geometries/PlaneGeometry.js';
 import { CylinderGeometry } from 'three/src/geometries/CylinderGeometry.js';
+import { BoxGeometry } from 'three/src/geometries/BoxGeometry.js';
+
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 
 //import font from 'three/examples/fonts/helvetiker_regular.typeface.json'
@@ -73,64 +76,70 @@ const Base = () => {
 
 const Configurator = () => {
     
-    const [body, setBody] = useState('jordan');
+    const [body, setBody] = useState('torso');
         
-    const Car = ({ position, rotation, body, setBody }) => {
+    
+    const Car = ({ position, rotation, body, setBody }) => {        
+        const Axel = ({ position, rotation = [Math.PI/2,0,0], size = 4 }) => {
+            extend({CylinderGeometry})
+            return (<>
+                <group position={ position }>
+                    <mesh position={[0,1,-1]}  rotation={ rotation }>
+                        
+                        <cylinderGeometry attach="geometry" args={[0.05,0.05,size]} />
+                        <meshLambertMaterial attach="material" color="#ccc" roughness={0} metalness={0.1} />
+                    </mesh>
+                </group>
+            </>)
+        }
+                
 
+        const Wheels = () => {
+            return (<>
+                <ModelViewer
+                    model="./assets/models/wheels.gltf"                
+                />
+                <ModelViewer
+                    position={[0,0,1] } scale={[0.8,0.8,0.8]}
+                    model="./assets/models/wheels-front.gltf"                
+                />            
+            </>)
+        };
+
+
+        const Spoiler = () => {            
+            return (
+                <>
+                    <Axel position={[0,1.5,0]} rotation={ [-Math.PI/8,0,0] }  size={ 1 } />
+                    <Axel position={[1,1.5,0]} rotation={ [-Math.PI/8,0,0] }  size={ 1 } />
+                    <group position={[-0.5,3.2,-3]} >                    
+                        <mesh rotation={[Math.PI/10,0,0]}>
+                            <boxGeometry args={[6, .1, 1.5]} />
+                            <meshStandardMaterial color={'white'} />
+                        </mesh>
+                    </group>
+                </>
+            )
+        }
+        const Frame = () => {
+            return (
+                <group>
+                    <Axel position={[0,0,3]} rotation={ [0,0,Math.PI/2] } size={ 2 }/>
+                    <Axel position={[0,0.5,0]} rotation={ [0,0,Math.PI/2] }/>
+                    <Axel position={[-0.25,0,0]} size={ 6 }/>
+                    <Axel position={[0.5,0,0]} size={ 6 }/>                    
+                </group>    
+            )
+        }
         return (
             <group rotation={ rotation } position={ position }>
+                <Spoiler/>
                 <Wheels />
+                <Frame />
                 <Body body={ body} setBody={ setBody} />
             </group>
         )
     };
-
-    const Axel = ({ position }) => {
-        extend({CylinderGeometry})
-        return (<>
-            <group position={ position }>
-                <mesh position={[0,1,-2]}  rotation={ [0,0,Math.PI/2] }>
-                    
-                    <cylinderGeometry attach="geometry" args={[0.05,0.05,4]} />
-                    <meshLambertMaterial attach="material" color="white" roughness={0} metalness={0.1} />
-                </mesh>
-            </group>
-        </>)
-    }
-            
-
-    const Wheels = () => {
-        return (<>
-            <BackWheels />
-            <FrontWheels position={[0,0,1] } scale={[0.8,0.8,0.8]}/>
-        </>)
-    };
-
-    const BackWheels = ({ position }) => {
-        return (<>
-            <group position={ position }>
-                <Axel position={ position }/>
-                <ModelViewer
-                    model="./assets/models/wheels.gltf"                
-                />
-            </group>
-        </>)
-    };
-
-
-    const FrontWheels = ({ position, scale }) => {
-        return (<>
-            <group position={ position } >
-                <Axel/>
-                <ModelViewer
-                    scale={ scale }
-                    model="./assets/models/wheels-front.gltf"                                
-                />
-            </group>
-        </>)
-    };
-
-    
 
     const changeBody = (currBody) => {    
         let index  = bodies.indexOf(currBody);
@@ -157,6 +166,7 @@ const Configurator = () => {
             />
         </>)
     };
+
     return (
         <>
             <Car setBody={ setBody } body={ body } position={[0,-3.5,-7]} rotation={[0,-Math.PI/9,0]}/>        
@@ -189,7 +199,7 @@ const Scene = () => {
       <>
         <OrbitControls />        
 
-        <pointLight position={[-10, 10, -10]} radius={10} color="#3333300" intensity={1.5} castShadow />
+        <pointLight position={[-10, 10, -10]} radius={10} color="#ffff00" intensity={0.5} castShadow />
         <pointLight position={[10, -10, 10]} intensity={1} castShadow />        
         <ambientLight intensity={0.3} castShadow />        
         
