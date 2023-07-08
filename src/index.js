@@ -220,7 +220,7 @@ const Configurator = () => {
         return (<>
             <ModelViewer
                 clickHandler={() => setBody(changeBody(body))}
-                model={`/assets/models/body/${body.id}.gltf`}
+                model={`./assets/models/body/${body.id}.gltf`}
                 position={position}
                 rotation={rotation}
                 scale={scale}
@@ -239,7 +239,7 @@ const ModelPreload = () => {
     return bodies.forEach((body) => {
         return (
             <ModelViewer
-                model={`/assets/models/body/${body.id}.gltf`}
+                model={`./assets/models/body/${body.id}.gltf`}
             />
         )
     });
@@ -275,20 +275,19 @@ const Scene = () => {
 
             <Logo />
 
-            
+            <ModelPreload />
             <Track/>
             <Base />
             {/* <Ground /> */}
 
-            <Configurator />
-            <ModelPreload />
+            <Configurator />            
         </>
     );
 };
 
 
 
-    
+
 createRoot(document.getElementById('root')).render(
     <>
           <VRButton />
