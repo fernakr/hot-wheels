@@ -87,7 +87,7 @@ const Logo = () => {
     let taglineFont = fontLoader.parse(myFont);
     const taglineArgs = [`"We'll make a car\n out of anything!!"`, { font: taglineFont, size: 0.7, height: .01 }];
     extend({ TextGeometry });
-    return (<group position={[0, 0, -1]}>
+    return (<group position={[0, -1, -14]}>
         <ModelViewer
             model="./assets/models/hotwheels.gltf"
 
@@ -96,7 +96,7 @@ const Logo = () => {
         {/* Add text  */}
         
         {taglineFont &&
-            <group position={[-1, 3, 0]}>
+            <group position={[-1, 4.5, 0]}>
                 <mesh >
                     <textGeometry attach="geometry" args={taglineArgs} />
                     <meshStandardMaterial attach="material" color="white" />
@@ -128,7 +128,7 @@ const Ground = () => {
 const Base = () => {
     extend({ CylinderGeometry })
     return (<>
-        <mesh receiveShadow position={[0.5, -3.5, -2.25]} rotation={[0, 0, 0]}  >
+        <mesh receiveShadow position={[0.5, -6.5, -13]} rotation={[0, 0, 0]}  >
 
             <shadowMaterial opacity={1} />
             <cylinderGeometry attach="geometry" args={[4, 4.25, 0.4, 50, 2]} />
@@ -237,7 +237,7 @@ const Configurator = () => {
 
     return (
         <>
-            <Car setBody={setBody} body={body} position={[0, -3, 0]} rotation={[0, -Math.PI / 9, 0]} />
+            <Car setBody={setBody} body={body} position={[0, -6, -13]} rotation={[0, -Math.PI / 9, 0]} />
         </>
     )
 }
@@ -301,7 +301,7 @@ const Scene = () => {
 
             <Logo />
             
-            <group position={[-12, -4, 6]}
+            <group position={[-12, -7, -7]}
             rotation={[0,Math.PI/3,0]}
             scale={[52,52,52]} >
                 <AnimationTest/>
@@ -324,7 +324,7 @@ createRoot(document.getElementById('root')).render(
     <>
           <VRButton />
           <Canvas
-            camera={{ position: [0, 2, 9], fov: 80 }}
+            camera={{ position: [0, 0,0], fov: 80 }}
             onCreated={({ gl }) => {
                 gl.setClearColor(new THREE.Color(0x0000cc));
             }}>
