@@ -117,10 +117,10 @@ const Logo = () => {
 const Ground = () => {
     extend({ PlaneGeometry })
     return (<>
-        <mesh position={[0, 0, -16]}>
+        <mesh position={[0, -7, -4]} rotation={[-Math.PI/2,0,0]}>
 
             <planeGeometry attach="geometry" args={[100, 100]} />
-            <meshPhongMaterial attach="material" color="#000066" />
+            <meshPhongMaterial roughness={0} clearcoat={0} attach="material" color="#333399" />
         </mesh>
     </>)
 }
@@ -136,9 +136,15 @@ const Configurator = () => {
         return (<>
             <mesh receiveShadow position={[0, 0, 0]} rotation={[0, 0, 0]}  >
     
-                <shadowMaterial opacity={1} />
+            
                 <cylinderGeometry attach="geometry" args={[4, 4.25, 0.4, 50, 2]} />
-                <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color="#555" roughness={0} />
+                <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color="#999" roughness={0} />
+            </mesh>
+             <mesh receiveShadow position={[0, -2, 0]} rotation={[0, 0, 0]}  >
+    
+                <shadowMaterial opacity={1} />
+                <cylinderGeometry attach="geometry" args={[4.25, 4.25, 3.6, 50, 4]} />
+                <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color="#999" roughness={0} />
             </mesh>
         </>)
     };
@@ -254,16 +260,6 @@ const ModelPreload = () => {
 }
 
 const Track = () => {
-    return (
-        <ModelViewer
-            position={[-9, -4, 0]}
-            scale={[52,52,52]}
-            model="./assets/models/track.gltf"
-            />
-    )
-}
-
-const AnimationTest = () => {
     
     const group = useRef();    
 
@@ -305,13 +301,13 @@ const Scene = () => {
             <group position={[-12, -7, -7]}
             rotation={[0,Math.PI/3,0]}
             scale={[52,52,52]} >
-                <AnimationTest/>
+                <Track/>
             </group>
             
             <ModelPreload />
             {/* <Track/> */}
             
-            {/* <Ground /> */}
+            <Ground />
 
             <Configurator />            
         </>
