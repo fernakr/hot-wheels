@@ -200,11 +200,11 @@ const Configurator = () => {
                 <Spoiler />
                 <Wheels />
                 <Frame />
-                <Interactive                    
+                {/* <Interactive                    
                     onSelect={(event) => setBody(changeBody(body))}
-                    >
+                    > */}
                     <Body body={body} setBody={setBody} />
-                </Interactive>
+                {/* </Interactive> */}
             </group>
         )
     };
@@ -237,7 +237,7 @@ const Configurator = () => {
 
     return (
         <>
-            <Car setBody={setBody} body={body} position={[0, -6, -13]} rotation={[0, -Math.PI / 9, 0]} />
+            <Car setBody={setBody} body={body} position={[0, -6, -11]} rotation={[0, -Math.PI / 9, 0]} />
         </>
     )
 }
@@ -293,7 +293,7 @@ const Scene = () => {
 
     return (
         <>
-            <OrbitControls />
+            
 
             <pointLight position={[-10, 10, -10]} radius={10} color="#ffff00" intensity={0.5} castShadow />
             <pointLight position={[10, -10, 10]} intensity={1} castShadow />
@@ -322,15 +322,16 @@ const Scene = () => {
 
 createRoot(document.getElementById('root')).render(
     <>
-          <VRButton />
+          {/* <VRButton /> */}
           <Canvas
-            camera={{ position: [0, 0,0], fov: 80 }}
+            //camera={{ position: [0, 0,0], fov: 80 }}
             onCreated={({ gl }) => {
                 gl.setClearColor(new THREE.Color(0x0000cc));
             }}>
-            <XR>
-                <Hands/>
-                <Controllers/>
+                <OrbitControls />
+            {/* <XR> */}
+                {/* <Hands/>
+                <Controllers/> */}
                 <Scene />
 
                 {/* <EffectComposer>
@@ -341,7 +342,7 @@ createRoot(document.getElementById('root')).render(
                 <SoftShadows size={{ value: 25, min: 0, max: 100 }}
                     focus={{ value: 0, min: 0, max: 2 }}
                     samples={{ value: 10, min: 1, max: 20, step: 1 }} />
-            </XR>
+            {/* </XR> */}
         </Canvas>
     </>
 ,
