@@ -288,7 +288,7 @@ const Scene = () => {
 
 
 
-
+    
 createRoot(document.getElementById('root')).render(
     <>
           <VRButton />

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "homepage": ".",
   "dependencies": {
     "@react-three/drei": "^9.78.0",
     "@react-three/fiber": "^8.13.4",
