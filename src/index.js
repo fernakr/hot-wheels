@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client'
-import React, { useRef, useState, Suspense } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 //import { Bloom, DepthOfField, EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
@@ -18,7 +18,7 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 //import font from 'three/examples/fonts/helvetiker_regular.typeface.json'
 
 import { Canvas, useFrame, useLoader, extend } from '@react-three/fiber'
-import { OrbitControls, SoftShadows } from '@react-three/drei'
+import { OrbitControls, SoftShadows, useAnimations, useGLTF } from '@react-three/drei'
 import * as THREE from 'three';
 import myFont from './flash_rogers.typeface.json';
 
@@ -78,32 +78,39 @@ let bodies = [
 const ModelViewer = ({ model, position, rotation, scale, clickHandler }) => {
     const gltf = useLoader(GLTFLoader, model)
     // apply position to model
-
+    const animations = useAnimations(gltf.animations);
     return <primitive castShadow onClick={clickHandler} object={gltf.scene} position={position} rotation={rotation} scale={scale} />
 }
 
 const Logo = () => {
     let fontLoader = new FontLoader();
     let taglineFont = fontLoader.parse(myFont);
-
+    const taglineArgs = [`"We'll make a car\n out of anything!!"`, { font: taglineFont, size: 0.7, height: .01 }];
     extend({ TextGeometry });
-    return (<>
+    return (<group position={[0, 0, -1]}>
         <ModelViewer
             model="./assets/models/hotwheels.gltf"
-            position={[0, 0, -8]}
+
             rotation={[Math.PI / 20, 0, 0]}
         />
         {/* Add text  */}
-
+        
         {taglineFont &&
-            <mesh position={[-1, 3, -7]}>
-                <textGeometry attach="geometry" args={[`"We'll make a car\n out of anything!!"`, { font: taglineFont, size: 0.7, height: .01 }]} />
-                <meshStandardMaterial attach="material" color="white" />
-            </mesh>
+            <group position={[-1, 3, 0]}>
+                <mesh >
+                    <textGeometry attach="geometry" args={taglineArgs} />
+                    <meshStandardMaterial attach="material" color="white" />
+                </mesh>
+                <mesh position={[0.1,-0.1,-0.1]}>
+                    <textGeometry attach="geometry" args={taglineArgs} />
+                    <meshStandardMaterial attach="material" color="navy" />
+                </mesh>
+            </group>
         }
 
 
-    </>)
+
+    </group>)
 };
 
 
@@ -121,10 +128,10 @@ const Ground = () => {
 const Base = () => {
     extend({ CylinderGeometry })
     return (<>
-        <mesh receiveShadow position={[0, -5, -11.85]} rotation={[0, 0, 0]}  >
+        <mesh receiveShadow position={[0.5, -3.5, -2.25]} rotation={[0, 0, 0]}  >
 
             <shadowMaterial opacity={1} />
-            <cylinderGeometry attach="geometry" args={[6, 6.25, 0.4, 50, 2]} />
+            <cylinderGeometry attach="geometry" args={[4, 4.25, 0.4, 50, 2]} />
             <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color="#555" roughness={0} />
         </mesh>
     </>)
@@ -230,7 +237,7 @@ const Configurator = () => {
 
     return (
         <>
-            <Car setBody={setBody} body={body} position={[0, -3.5, -7]} rotation={[0, -Math.PI / 9, 0]} />
+            <Car setBody={setBody} body={body} position={[0, -3, 0]} rotation={[0, -Math.PI / 9, 0]} />
         </>
     )
 }
@@ -255,6 +262,25 @@ const Track = () => {
     )
 }
 
+const AnimationTest = () => {
+    
+    const group = useRef();    
+
+    const { scene, animations } = useGLTF("./assets/models/track.gltf", true);
+    const { actions, mixer } = useAnimations(animations, group);
+
+
+    
+    useEffect(() => {            
+        //console.log(actions);
+        actions['Chomper_Tooth (6).003_RotatingObstacletest_0Action'].play();
+        actions['Sketchfab_model.001Action'].play();
+    }, [mixer]);
+  
+    return <primitive ref={group} object={scene} dispose={null} />;
+  }
+  
+
 const Scene = () => {
 
     // set background color of scene    
@@ -274,9 +300,15 @@ const Scene = () => {
             <ambientLight intensity={0.3} castShadow />
 
             <Logo />
-
+            
+            <group position={[-12, -4, 6]}
+            rotation={[0,Math.PI/3,0]}
+            scale={[52,52,52]} >
+                <AnimationTest/>
+            </group>
+            
             <ModelPreload />
-            <Track/>
+            {/* <Track/> */}
             <Base />
             {/* <Ground /> */}
 
@@ -292,7 +324,7 @@ createRoot(document.getElementById('root')).render(
     <>
           <VRButton />
           <Canvas
-            camera={{ position: [0, 0, 0], fov: 80 }}
+            camera={{ position: [0, 2, 9], fov: 80 }}
             onCreated={({ gl }) => {
                 gl.setClearColor(new THREE.Color(0x0000cc));
             }}>
