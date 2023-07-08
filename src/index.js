@@ -466,7 +466,11 @@ const App = () => {
         onCreated={({ gl }) => {
             gl.setClearColor(new THREE.Color(0x0000cc));
         }}>
-        <OrbitControls makeDefault />
+        <OrbitControls makeDefault                   
+                  minPolarAngle={-Math.PI/8}
+                  maxPolarAngle={Math.PI/2 + Math.PI/20}
+                
+         />
         <EyeAnimation status={ status } carPosition={ carPosition }/>
 
             
