@@ -125,24 +125,24 @@ const Ground = () => {
     </>)
 }
 
-const Base = () => {
-    extend({ CylinderGeometry })
-    return (<>
-        <mesh receiveShadow position={[0.5, -6.5, -13]} rotation={[0, 0, 0]}  >
-
-            <shadowMaterial opacity={1} />
-            <cylinderGeometry attach="geometry" args={[4, 4.25, 0.4, 50, 2]} />
-            <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color="#555" roughness={0} />
-        </mesh>
-    </>)
-};
-
 const Configurator = () => {
 
     const currBody = bodies[0];
     const [body, setBody] = useState(currBody);
 
 
+    const Base = () => {
+        extend({ CylinderGeometry })
+        return (<>
+            <mesh receiveShadow position={[0, 0, 0]} rotation={[0, 0, 0]}  >
+    
+                <shadowMaterial opacity={1} />
+                <cylinderGeometry attach="geometry" args={[4, 4.25, 0.4, 50, 2]} />
+                <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color="#555" roughness={0} />
+            </mesh>
+        </>)
+    };
+    
     const Car = ({ position, rotation, body, setBody }) => {
         const Axel = ({ position, rotation = [Math.PI / 2, 0, 0], size = 4 }) => {
             extend({ CylinderGeometry })
@@ -205,6 +205,7 @@ const Configurator = () => {
                     > */}
                     <Body body={body} setBody={setBody} />
                 {/* </Interactive> */}
+                <Base />
             </group>
         )
     };
@@ -237,7 +238,7 @@ const Configurator = () => {
 
     return (
         <>
-            <Car setBody={setBody} body={body} position={[0, -6, -11]} rotation={[0, -Math.PI / 9, 0]} />
+            <Car setBody={setBody} body={body} position={[0, -4, -11]} rotation={[0, -Math.PI / 9, 0]} />
         </>
     )
 }
@@ -309,7 +310,7 @@ const Scene = () => {
             
             <ModelPreload />
             {/* <Track/> */}
-            <Base />
+            
             {/* <Ground /> */}
 
             <Configurator />            
