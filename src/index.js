@@ -130,21 +130,19 @@ const Ground = () => {
     </>)
 }
 
-const Configurator = ({ status, carPosition, body }) => {
+const Configurator = ({ status, carPosition, body, bodyColor }) => {
 
 
 
     const Base = () => {
         extend({ CylinderGeometry })
         return (<>
-            <mesh receiveShadow position={[0, 0, 0]} rotation={[0, 0, 0]}  >
-    
-            
+            <mesh receiveShadow position={[0, 0, 0]} rotation={[0, 0, 0]}  >            
                 <cylinderGeometry attach="geometry" args={[4, 4.25, 0.4, 50, 2]} />
                 <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color="#999" roughness={0} />
             </mesh>
-             <mesh receiveShadow position={[0, -2, 0]} rotation={[0, 0, 0]}  >
-    
+            <mesh receiveShadow position={[0, -2, 0]} rotation={[0, 0, 0]}  >
+
                 <shadowMaterial opacity={1} />
                 <cylinderGeometry attach="geometry" args={[4.25, 4.25, 3.6, 50, 4]} />
                 <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color="#999" roughness={0} />
@@ -152,15 +150,20 @@ const Configurator = ({ status, carPosition, body }) => {
         </>)
     };
     
-    const Car = ({ position, rotation, body, carPosition }) => {
+    const Car = ({ position, rotation, body, bodyColor, carPosition }) => {
+        // console.log(bodyColor);
+        // let material = new THREE.MeshLambertMaterial({color: bodyColor})
+        // useEffect(() => {
+        //     material = );            
+        //     console.log(material);
+        //   }, [bodyColor])
+        
         const Axel = ({ position, rotation = [Math.PI / 2, 0, 0], size = 4 }) => {
             extend({ CylinderGeometry })
             return (<>
                 <group position={position}>
-                    <mesh position={[0, 1, -1]} rotation={rotation}>
-
-                        <cylinderGeometry attach="geometry" args={[0.05, 0.05, size]} />
-                        <meshLambertMaterial attach="material" color="#ccc" roughness={0} metalness={0.1} />
+                    <mesh position={[0, 1, -1]} rotation={rotation} material={ new THREE.MeshLambertMaterial({color: bodyColor}) }>
+                        <cylinderGeometry attach="geometry" args={[0.05, 0.05, size]} />                        
                     </mesh>
                 </group>
             </>)
@@ -186,9 +189,8 @@ const Configurator = ({ status, carPosition, body }) => {
                     <Axel position={[0, 1.5, 0]} rotation={[-Math.PI / 8, 0, 0]} size={1} />
                     <Axel position={[1, 1.5, 0]} rotation={[-Math.PI / 8, 0, 0]} size={1} />
                     <group position={[-0.5, 3.2, -3]} >
-                        <mesh rotation={[Math.PI / 10, 0, 0]}>
-                            <boxGeometry args={[6, .1, 1.5]} />
-                            <meshStandardMaterial color={'white'} />
+                        <mesh rotation={[Math.PI / 10, 0, 0]}  material={ new THREE.MeshLambertMaterial({color: bodyColor}) }>
+                            <boxGeometry args={[6, .1, 1.5]} />                            
                         </mesh>
                     </group>
                 </>
@@ -206,7 +208,7 @@ const Configurator = ({ status, carPosition, body }) => {
         }
         return (
             <animated.group rotation={rotation} position={position}>
-                <Spoiler />
+                <Spoiler/>
                 <Wheels />
                 <Frame />
                 {/* <Interactive                    
@@ -219,12 +221,12 @@ const Configurator = ({ status, carPosition, body }) => {
         )
     };
 
-    const changeBody = (currBody) => {
-        let index = bodies.findIndex(body => body.id === currBody.id);
-        index++;
-        if (index > bodies.length - 1) index = 0;
-        return bodies[index];
-    }
+    // const changeBody = (currBody) => {
+    //     let index = bodies.findIndex(body => body.id === currBody.id);
+    //     index++;
+    //     if (index > bodies.length - 1) index = 0;
+    //     return bodies[index];
+    // }
 
     // on click change body
 
@@ -254,7 +256,7 @@ const Configurator = ({ status, carPosition, body }) => {
 
     return (
         <>
-            <Car status={ status } body={body} position={position} rotation={ rotation } />           
+            <Car status={ status } body={body} bodyColor={ bodyColor} position={position} rotation={ rotation } />           
             {/* <ModelPreload changeBody={ changeBody } body={ body } position={position} rotation={[0, -Math.PI / 9, 0]} /> */}
         </>
     )
@@ -291,7 +293,7 @@ const Track = () => {
   }
   
 
-const Scene = ({ status, setStatus, carPosition, body }) => {
+const Scene = ({ status, setStatus, carPosition, body, bodyColor }) => {
 
     
     useFrame(() => {
@@ -327,7 +329,7 @@ const Scene = ({ status, setStatus, carPosition, body }) => {
                     </Html>
                 }
 
-                <Configurator body={ body } status={ status } carPosition={ carPosition} />            
+                <Configurator body={ body } bodyColor={ bodyColor } status={ status } carPosition={ carPosition} />            
             </Suspense>
         </>
     );
@@ -469,17 +471,20 @@ const App = () => {
     const [ status, setStatus ] = useState('inactive');
     const currBody = bodies[0];
     const [body, setBody] = useState(currBody);
+    const [bodyColor, setBodyColor] = useState('#ffffff');
 
     const carPosition = [0, -12, -11];
+    console.log(bodyColor);
     return (
         <>
          { status === 'active' && body &&                  
-                <div className="details_wrapper">              
-                    <Carousel infiniteLoop={ true } showIndicators={ false } onChange={ (index) => setBody(bodies[index]) }>
+                <div className="details_wrapper">     
+                    <h2>Body Type</h2>         
+                    <Carousel showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => setBody(bodies[index]) }>
                         { bodies.map((body, index) =>             
                                 (
                                     <div key={ index } className='details'>
-                                        <h2>{ body.name }</h2>
+                                        <h3>{ body.name }</h3>
                                         <ul>
                                             { body.speed && <li>Speed: { body.speed }</li> }
                                             { body.agility && <li>Agility: { body.agility }</li> }                            
@@ -489,6 +494,8 @@ const App = () => {
                                 )
                         ) }
                     </Carousel>
+                    <h2>Body Color</h2>                    
+                    <input type="color" defaultValue={ bodyColor } onChange={(e) => {console.log(e.target.value); setBodyColor(e.target.value)}}/>
                 </div>                
             }
              <Canvas        
@@ -508,7 +515,7 @@ const App = () => {
             {/* <XR> */}
                 {/* <Hands/>
                 <Controllers/> */}
-                <Scene body={ body } status={ status } setStatus={ setStatus }  carPosition={ carPosition }/>
+                <Scene body={ body } bodyColor={ bodyColor }status={ status } setStatus={ setStatus }  carPosition={ carPosition }/>
 
                 {/* <EffectComposer>
 
