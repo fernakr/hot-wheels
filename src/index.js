@@ -77,10 +77,10 @@ let bodies = [
     }
 ];
 
-const ModelViewer = ({ model, position, rotation, scale, clickHandler }) => {
+const ModelViewer = ({ model, position, rotation, scale, clickHandler, visible = true }) => {
     const gltf = useLoader(GLTFLoader, model)
     // apply position to model
-    const animations = useAnimations(gltf.animations);
+    //const animations = useAnimations(gltf.animations);
     return <primitive castShadow onClick={clickHandler} object={gltf.scene} position={position} rotation={rotation} scale={scale} />
 }
 
@@ -235,6 +235,7 @@ const Configurator = ({ status, carPosition }) => {
 
         return (<>
             <ModelViewer
+                visible={ true }
                 clickHandler={() => setBody(changeBody(body))}
                 model={`./assets/models/body/${body.id}.gltf`}
                 position={position}
@@ -244,24 +245,47 @@ const Configurator = ({ status, carPosition }) => {
         </>)
     };
 
-    const { position } = useSpring({ position: status === 'active' ? [0, -4, -11] : carPosition,config: { duration: 1000, tension: 300, friction: 20  }, // Set the duration to 1000 milliseconds (1 second)
+    const startCarPosition = [...carPosition ];
+    startCarPosition[1] = -4;
+
+    const { position, rotation } = useSpring({ position: status === 'active' ? startCarPosition : carPosition, rotation: status === 'active' ? [0, -Math.PI / 14, 0] : [0, Math.PI / 9, 0], config: { duration: 1000, tension: 300, friction: 20  }, // Set the duration to 1000 milliseconds (1 second)
     })
 
     return (
         <>
-            <Car status={ status } setBody={setBody} body={body} position={position} rotation={[0, -Math.PI / 9, 0]} />
+            <Car status={ status } setBody={setBody} body={body} position={position} rotation={ rotation} />
+            { status === 'active' && body &&  
+                <Html position={position}>
+                        <div className='details'>
+                            <h2>{ body.name }</h2>
+                            <ul>
+                            { body.speed && <li>Speed: { body.speed }</li> }
+                            { body.agility && <li>Agility: { body.agility }</li> }                            
+                            { body.features.map((feature, index) => <li key={index}>{ feature }</li>) }
+                        
+                            </ul>
+
+
+                        </div>
+                </Html>
+            }
+            {/* <ModelPreload changeBody={ changeBody } body={ body } position={position} rotation={[0, -Math.PI / 9, 0]} /> */}
         </>
     )
 }
 
-const ModelPreload = () => {
-    return bodies.forEach((body) => {
-        return (
-            <ModelViewer
-                model={`./assets/models/body/${body.id}.gltf`}
-            />
-        )
-    });
+const ModelPreload = ({ body, changeBody, position, rotation }) => {
+    // preload next body
+    
+    let nextBody = changeBody(body);
+    console.log(nextBody   )
+    return (<>
+        <ModelViewer
+            rotation={rotation}            
+            position={position} 
+            model={`./assets/models/body/${nextBody.id}.gltf`}
+        />
+    </>)
 }
 
 const Track = () => {
@@ -302,8 +326,7 @@ const Scene = ({ status, setStatus, carPosition }) => {
 
             <pointLight position={[-10, 10, -10]} radius={10} color="#ffff00" intensity={0.5} castShadow />
             <pointLight position={[10, -10, 10]} intensity={1} castShadow />
-            <ambientLight intensity={0.3} castShadow />
-
+            <ambientLight intensity={0.3} castShadow />            
             <Logo />
              <Suspense fallback={<Loader />}>
                 <group 
@@ -312,8 +335,7 @@ const Scene = ({ status, setStatus, carPosition }) => {
                     scale={[52,52,52]} >
                     <Track/>
                 </group>
-                
-                <ModelPreload />
+                                
                 
                 <Ground />
                 { status != 'active' && <Html>
@@ -329,10 +351,12 @@ const Scene = ({ status, setStatus, carPosition }) => {
 
 const Loader = () => {
     return (
-        <mesh>
-            <boxGeometry args={[1, 1, 1]} />
-            <meshStandardMaterial color={'white'} />
-        </mesh>
+        <>            
+            <mesh>            
+                <boxGeometry args={[1, 1, 1]} />
+                <meshStandardMaterial color={'white'} />
+            </mesh>
+        </>        
     )
 }
 
@@ -421,13 +445,13 @@ const defaultPosition = {
 
 
     let targetPosition = [...carPosition]
-    targetPosition[0] = targetPosition[0] + 2;
+    targetPosition[0] = targetPosition[0] + 5.5;
     targetPosition[1] = targetPosition[1] + 12;
     targetPosition[2] = targetPosition[2] -7;
 
     
     const closeBy = {
-        position: [0, 0, 0],
+        position: [2, 0, 0],
         target: targetPosition
     };
     
