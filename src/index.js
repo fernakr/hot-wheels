@@ -251,7 +251,7 @@ const Configurator = ({ status, carPosition, body, bodyColor }) => {
     const startCarPosition = [...carPosition ];
     startCarPosition[1] = -4;
 
-    const { position, rotation } = useSpring({ position: status === 'active' ? startCarPosition : carPosition, rotation: status === 'active' ? [0, -Math.PI / 14, 0] : [0, Math.PI / 9, 0], config: { duration: 1000, tension: 300, friction: 20  }, // Set the duration to 1000 milliseconds (1 second)
+    const { position, rotation } = useSpring({ position: status === 'active' ? startCarPosition : carPosition, rotation: status === 'active' ? [0, 0, 0] : [0, Math.PI / 9, 0], config: { duration: 1000, tension: 300, friction: 20  }, // Set the duration to 1000 milliseconds (1 second)
     })
 
     return (
@@ -310,7 +310,7 @@ const Scene = ({ status, setStatus, carPosition, body, bodyColor }) => {
 
             <pointLight position={[-10, 10, -10]} radius={10} color="#ffff00" intensity={0.5} castShadow />
             <pointLight position={[10, -10, 10]} intensity={1} castShadow />
-            <spotLight position={[10, 10, -10]} radius={ 0.1 } intensity={status === 'inactive' ? 0 : 0.5} castShadow />
+            <spotLight position={[10, 0, -15]} intensity={status === 'inactive' ? 0 : 0.5} castShadow />
             <ambientLight intensity={status === 'inactive' ? 0.3 : 0} castShadow />            
             <Logo />
              <Suspense fallback={<Loader />}>
@@ -431,13 +431,13 @@ const defaultPosition = {
 
 
     let targetPosition = [...carPosition]
-    targetPosition[0] = targetPosition[0] + 5.5;
+    targetPosition[0] = targetPosition[0] + 4.5;
     targetPosition[1] = targetPosition[1] + 12;
     targetPosition[2] = targetPosition[2] -7;
 
     
     const closeBy = {
-        position: [2, 0, 0],
+        position: [5, 0, 0],
         target: targetPosition
     };
     
