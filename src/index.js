@@ -3,6 +3,9 @@ import React, { useRef, useState, useMemo, useEffect, Suspense } from 'react'
 //import { Bloom, DepthOfField, EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { useSpring, a, animated, config } from '@react-spring/three'
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import { Carousel } from 'react-responsive-carousel';
+
 
 
 import { VRButton, ARButton, XR, Controllers, Hands, Interactive } from '@react-three/xr'
@@ -27,7 +30,7 @@ import myFont from './flash_rogers.typeface.json';
 let bodies = [
     {
         id: 'jordan',
-        name: 'Michael Jordan',
+        name: 'Michael Jordan Head',
         speed: 9,
         agility: 8,
         features: [
@@ -37,11 +40,11 @@ let bodies = [
     }, 
     {
         id: 'heart',
-        name: 'Heart',
+        name: 'Human Heart',
         speed: 9,
         agility: 8,
         features: [
-            '6 NBA Championships',
+            'Keeps you alive',
             '5 MVP Awards',
         ]
     }, 
@@ -127,10 +130,8 @@ const Ground = () => {
     </>)
 }
 
-const Configurator = ({ status, carPosition }) => {
+const Configurator = ({ status, carPosition, body }) => {
 
-    const currBody = bodies[0];
-    const [body, setBody] = useState(currBody);
 
 
     const Base = () => {
@@ -151,7 +152,7 @@ const Configurator = ({ status, carPosition }) => {
         </>)
     };
     
-    const Car = ({ position, rotation, body, setBody, carPosition }) => {
+    const Car = ({ position, rotation, body, carPosition }) => {
         const Axel = ({ position, rotation = [Math.PI / 2, 0, 0], size = 4 }) => {
             extend({ CylinderGeometry })
             return (<>
@@ -211,7 +212,7 @@ const Configurator = ({ status, carPosition }) => {
                 {/* <Interactive                    
                     onSelect={(event) => setBody(changeBody(body))}
                     > */}
-                    <Body body={body} setBody={setBody} />
+                    <Body body={body}  />
                 {/* </Interactive> */}
                 <Base />
             </animated.group>
@@ -228,7 +229,7 @@ const Configurator = ({ status, carPosition }) => {
     // on click change body
 
 
-    const Body = ({ position, body, setBody, rotation, scale }) => {
+    const Body = ({ position, body, rotation, scale }) => {
 
 
 
@@ -236,7 +237,7 @@ const Configurator = ({ status, carPosition }) => {
         return (<>
             <ModelViewer
                 visible={ true }
-                clickHandler={() => setBody(changeBody(body))}
+                //clickHandler={() => setBody(changeBody(body))}
                 model={`./assets/models/body/${body.id}.gltf`}
                 position={position}
                 rotation={rotation}
@@ -253,22 +254,7 @@ const Configurator = ({ status, carPosition }) => {
 
     return (
         <>
-            <Car status={ status } setBody={setBody} body={body} position={position} rotation={ rotation} />
-            { status === 'active' && body &&  
-                <Html position={position}>
-                        <div className='details'>
-                            <h2>{ body.name }</h2>
-                            <ul>
-                            { body.speed && <li>Speed: { body.speed }</li> }
-                            { body.agility && <li>Agility: { body.agility }</li> }                            
-                            { body.features.map((feature, index) => <li key={index}>{ feature }</li>) }
-                        
-                            </ul>
-
-
-                        </div>
-                </Html>
-            }
+            <Car status={ status } body={body} position={position} rotation={ rotation } />           
             {/* <ModelPreload changeBody={ changeBody } body={ body } position={position} rotation={[0, -Math.PI / 9, 0]} /> */}
         </>
     )
@@ -278,7 +264,7 @@ const ModelPreload = ({ body, changeBody, position, rotation }) => {
     // preload next body
     
     let nextBody = changeBody(body);
-    console.log(nextBody   )
+    //console.log(nextBody   )
     return (<>
         <ModelViewer
             rotation={rotation}            
@@ -305,13 +291,9 @@ const Track = () => {
   }
   
 
-const Scene = ({ status, setStatus, carPosition }) => {
+const Scene = ({ status, setStatus, carPosition, body }) => {
 
-    //const [ status, setStatus ] = useState('inactive');
-    //const { position } = useSpring({ position: status === 'active' ? [0, 0, -3] : [0, 0, 0],config: { duration: 1000, tension: 300, friction: 20  }});    
-
-    // set background color of scene    
-
+    
     useFrame(() => {
         // Perform any animation or updates here
     });
@@ -326,7 +308,8 @@ const Scene = ({ status, setStatus, carPosition }) => {
 
             <pointLight position={[-10, 10, -10]} radius={10} color="#ffff00" intensity={0.5} castShadow />
             <pointLight position={[10, -10, 10]} intensity={1} castShadow />
-            <ambientLight intensity={0.3} castShadow />            
+            <spotLight position={[10, 10, -10]} radius={ 0.1 } intensity={status === 'inactive' ? 0 : 0.5} castShadow />
+            <ambientLight intensity={status === 'inactive' ? 0.3 : 0} castShadow />            
             <Logo />
              <Suspense fallback={<Loader />}>
                 <group 
@@ -338,12 +321,13 @@ const Scene = ({ status, setStatus, carPosition }) => {
                                 
                 
                 <Ground />
-                { status != 'active' && <Html>
-                    <button className="start-button" onClick={() => setStatus('active')}>Build a Car</button>
-                </Html>
+                { status != 'active' && 
+                    <Html>
+                        <button className="start-button" onClick={() => setStatus('active')}>Build a Car</button>
+                    </Html>
                 }
 
-                <Configurator status={ status } carPosition={ carPosition} />            
+                <Configurator body={ body } status={ status } carPosition={ carPosition} />            
             </Suspense>
         </>
     );
@@ -483,37 +467,62 @@ const defaultPosition = {
 
 const App = () => {
     const [ status, setStatus ] = useState('inactive');
+    const currBody = bodies[0];
+    const [body, setBody] = useState(currBody);
+
     const carPosition = [0, -12, -11];
     return (
-        <Canvas
-        //camera={{ position: [0, 0,0], fov: 80 }}
-        onCreated={({ gl }) => {
-            gl.setClearColor(new THREE.Color(0x0000cc));
-        }}>
-        <OrbitControls makeDefault                   
-                  minPolarAngle={-Math.PI/8}
-                  maxPolarAngle={Math.PI/2 + Math.PI/20}
+        <>
+         { status === 'active' && body &&                  
+                <div className="details_wrapper">              
+                    <Carousel infiniteLoop={ true } showIndicators={ false } onChange={ (index) => setBody(bodies[index]) }>
+                        { bodies.map((body, index) =>             
+                                (
+                                    <div key={ index } className='details'>
+                                        <h2>{ body.name }</h2>
+                                        <ul>
+                                            { body.speed && <li>Speed: { body.speed }</li> }
+                                            { body.agility && <li>Agility: { body.agility }</li> }                            
+                                            { body.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                        
+                                        </ul>
+                                    </div>
+                                )
+                        ) }
+                    </Carousel>
+                </div>                
+            }
+             <Canvas        
+            onCreated={({ gl }) => {
+                gl.setClearColor(new THREE.Color(0x0000cc));
+            }}>
+            <OrbitControls makeDefault                   
+                enablePan={false }
+                enableZoom={false }
+                minPolarAngle={-Math.PI/8}
+                maxPolarAngle={Math.PI/2 + Math.PI/20}
+                    
+            />
+            <EyeAnimation status={ status } carPosition={ carPosition }/>
+
                 
-         />
-        <EyeAnimation status={ status } carPosition={ carPosition }/>
+            {/* <XR> */}
+                {/* <Hands/>
+                <Controllers/> */}
+                <Scene body={ body } status={ status } setStatus={ setStatus }  carPosition={ carPosition }/>
 
-            
-        {/* <XR> */}
-            {/* <Hands/>
-            <Controllers/> */}
-            <Scene status={ status } setStatus={ setStatus }  carPosition={ carPosition }/>
+                {/* <EffectComposer>
 
-            {/* <EffectComposer>
+                    <Vignette eskil={false} offset={0.1} darkness={1.1} />
+                </EffectComposer> */}
 
-                <Vignette eskil={false} offset={0.1} darkness={1.1} />
-            </EffectComposer> */}
-
-            {/* <SoftShadows size={{ value: 25, min: 0, max: 100 }}
-                focus={{ value: 0, min: 0, max: 2 }}
-                samples={{ value: 10, min: 1, max: 20, step: 1 }} /> */}
-        {/* </XR> */}
-    </Canvas>
+                {/* <SoftShadows size={{ value: 25, min: 0, max: 100 }}
+                    focus={{ value: 0, min: 0, max: 2 }}
+                    samples={{ value: 10, min: 1, max: 20, step: 1 }} /> */}
+            {/* </XR> */}
+        </Canvas>    
+        </>
     )
+       
 }
 
 
