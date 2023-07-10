@@ -325,7 +325,7 @@ const Scene = ({ status, setStatus, carPosition, body, bodyColor, wheel }) => {
                 <Controls/>
             </animated.group> */}
 
-            <pointLight position={[-10, 10, -10]} radius={10} color="#ffff00" intensity={0.5} castShadow />
+            <pointLight position={[-10, 10, -10]} radius={10} intensity={0.5} castShadow />
             <pointLight position={[10, -10, 10]} intensity={1} castShadow />
             <spotLight position={[10, 0, -15]} intensity={status === 'inactive' ? 0 : 0.5} castShadow />
             <ambientLight intensity={status === 'inactive' ? 0.3 : 0} castShadow />            
