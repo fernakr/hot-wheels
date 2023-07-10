@@ -6,6 +6,8 @@ import { useSpring, a, animated, config } from '@react-spring/three'
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
 
+import './index.scss';
+
 import useSound from 'use-sound';
 import hydraulicSfx from './hydraulic.mp3';
 
@@ -33,6 +35,7 @@ let wheels = [
     {
         id: 'default',
         name: 'Wheels',
+        front: true,
         features: [
             'Classic'
         ]
@@ -40,6 +43,15 @@ let wheels = [
     {
         id: 'oranges',
         name: 'Oranges',
+        front: true,
+        features: [
+            'Citrusy'
+        ]
+    },
+    {
+        id: 'tentacles',
+        name: 'Tentacles',
+        front: false,
         features: [
             'Citrusy'
         ]
@@ -194,10 +206,11 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
                 <ModelViewer
                     model={`./assets/models/wheels/${wheel.id}/wheels.gltf`}
                 />
-                <ModelViewer
-                    position={[0, 0, 1]} scale={[0.8, 0.8, 0.8]}
-                    model={`./assets/models/wheels/${wheel.id}/wheels-front.gltf`}
-                />
+                { wheel.front && <ModelViewer
+                        position={[0, 0, 1]} scale={[0.8, 0.8, 0.8]}
+                        model={`./assets/models/wheels/${wheel.id}/wheels-front.gltf`}
+                    />
+                }
             </>)
         };
 
@@ -488,6 +501,7 @@ const defaultPosition = {
 
 
 const App = () => {
+    const [ activePanel, setActivePanel ] = useState(0);
     const [ status, setStatus ] = useState('inactive');
     const currBody = bodies[0];
     const [body, setBody] = useState(currBody);    
@@ -497,40 +511,69 @@ const App = () => {
     const [playHydraulic] = useSound(hydraulicSfx, { volume: 0.5 })
     const carPosition = [0, -12, -10];
     //console.log(bodyColor);
+    const panels = [
+        {
+            id: 'body',
+            name: 'Body'            
+        },
+        {
+            id: 'wheels',
+            name: 'Wheels'
+        },
+    ];
     return (
         <>
          { status === 'active' && body &&                  
                 <div className="details_wrapper">     
-                    <h2>Body Type</h2>         
-                    <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => setBody(bodies[index]) }>
-                        { bodies.map((body, index) =>             
-                                (
-                                    <div key={ index } className='details'>
-                                        <h3>{ body.name }</h3>
-                                        <ul>
-                                            { body.speed && <li>Speed: { body.speed }</li> }
-                                            { body.agility && <li>Agility: { body.agility }</li> }                            
-                                            { body.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                        
-                                        </ul>
-                                    </div>
-                                )
+                    <div className="details_content">
+                        { activePanel === 0 &&
+                            <div className="panel">
+                                <h2>Body Type</h2>         
+                                <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => setBody(bodies[index]) }>
+                                    { bodies.map((body, index) =>             
+                                            (
+                                                <div key={ index } className='details'>
+                                                    <h3>{ body.name }</h3>
+                                                    <ul>
+                                                        { body.speed && <li>Speed: { body.speed }</li> }
+                                                        { body.agility && <li>Agility: { body.agility }</li> }                            
+                                                        { body.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                        
+                                                    </ul>
+                                                </div>
+                                            )
+                                    ) }
+                                </Carousel>
+                                <h2>Body Color</h2>                    
+                                <input type="color" defaultValue={ bodyColor } onChange={(e) => {setBodyColor(e.target.value)}}/>
+                            </div>
+                        }
+                            { activePanel === 1 &&
+                            <div className="panel">
+                                <h2>Wheels</h2>
+                                <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => setWheel(wheels[index]) }>
+                                    { wheels.map((setWheels, index) =>             
+                                            (
+                                                <div key={ index } className='details'>
+                                                    <h3>{ wheel.name }</h3>
+                                                    <ul>                                                                  
+                                                        { wheel.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                        
+                                                    </ul>
+                                                </div>
+                                            )
+                                    ) }
+                                </Carousel>
+                            </div>
+                        }
+                    </div>
+                    <div className="details_nav">
+                        { panels.map((panel, index) =>
+                            <button key={ index } className={ `panel_nav ${activePanel === index ? 'is-active': ''}`} onClick={ () => setActivePanel(index)}>
+                                { panel.name }
+                            </button>
                         ) }
-                    </Carousel>
-                    <h2>Body Color</h2>                    
-                    <input type="color" defaultValue={ bodyColor } onChange={(e) => {setBodyColor(e.target.value)}}/>
-                    <h2>Wheels</h2>
-                    <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => setWheel(wheels[index]) }>
-                        { wheels.map((setWheels, index) =>             
-                                (
-                                    <div key={ index } className='details'>
-                                        <h3>{ wheel.name }</h3>
-                                        <ul>                                                                  
-                                            { wheel.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                        
-                                        </ul>
-                                    </div>
-                                )
-                        ) }
-                    </Carousel>
+
+
+                    </div>
                 </div>                
             }
              <Canvas        

@@ -1,0 +1,141 @@
+$color_1: #fff;
+$color_2: yellow;
+$color_3: var(--black);
+$color_4: white;
+$font-family_1: 'Audimat-Bold', sans-serif;
+$background-color_1: #0000cc;
+$border-right-color_1: yellow;
+$border-left-color_1: yellow;
+
+@font-face {
+	font-family: 'AUdimat-Bold';
+	font-style: normal;
+	font-weight: bold;
+	src: url('./assets/fonts/AUdimat-Bold.ttf') format('truetype');
+}
+.carousel.carousel-slider {
+	.control-arrow {
+		opacity: 1 !important;
+		&:before {
+			border-width: 30px 12px !important;
+		}
+	}
+	.control-prev {
+		&:before {
+			border-right-color: $border-right-color_1 !important;
+		}
+	}
+	.control-next {
+		&:before {
+			border-left-color: $border-left-color_1 !important;
+		}
+	}
+}
+.loader {
+	background-color: $background-color_1;
+	width: 200px;
+	height: 240px;
+	background-image: url('./assets/images/loader.gif');
+	background-blend-mode: multiply;
+	border-radius: 100%;
+}
+.loader_text {
+	font-family: $font-family_1;
+	color: $color_1;
+	font-size: 30px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 1;
+}
+body {
+	margin: 0;
+}
+html {
+	margin: 0;
+}
+:root {
+	--details-border: 10px;
+	--details-x-padding: 15px;
+	--details-y-padding: 10px;
+	--black: #333;
+	--details-offset: 30px;
+}
+.details {
+    &_wrapper {
+        position: fixed;
+        top: 60%;
+        left: 50%;
+        z-index: 1;
+        transform: translate(0, -50%);
+        width: 300px;
+        h2 {
+            color: $color_2;
+            font-family: $font-family_1;
+            font-size: 30px;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0px var(--black);
+        }
+        .carousel {
+            margin: 0 calc(-1 * var(--details-offset)) !important;
+        }
+    }
+	font-family: $font-family_1;
+	color: $color_3;
+	background: #fff;
+	border: var(--details-border) solid var(--black);
+	padding: var(--details-y-padding) var(--details-x-padding);
+	font-size: 20px;
+	margin: 0 var(--details-offset);
+	box-sizing: border-box;
+	ul {
+		margin-top: 0;
+		margin-left: 0;
+		margin-bottom: 0;
+		padding-left: 0;
+		list-style-type: none;
+		font-style: italic;
+		line-height: 1;
+	}
+	li {
+		&:not(:last-child) {
+			margin-bottom: 10px;
+		}
+	}
+	h3 {
+		margin: calc(-1 * var(--details-y-padding) - var(--details-border)) calc(-1 * var(--details-x-padding)) var(--details-y-padding);
+		background: var(--black);
+		color: $color_4;
+		line-height: 1;
+		padding: 10px 0 5px;
+		text-transform: uppercase;
+		font-size: 24px;
+	}
+    &_nav{
+        border-top: 2px solid $color_2;
+        margin-top: 10px;
+        button{
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: $color_2;
+            cursor: pointer;            
+            &:disabled{
+                color: $color_3;
+            }
+            &.is-active{
+                background: $color_2;
+                color: $color_3;
+            }
+        }        
+    }
+}
+.start-button {
+	background: #fff;
+	padding: 15px 20px;
+	white-space: nowrap;
+	text-transform: uppercase;
+	font-weight: bold;
+	cursor: pointer;
+}
