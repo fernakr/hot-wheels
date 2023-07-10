@@ -313,6 +313,7 @@ const Scene = ({ status, setStatus, carPosition, body, bodyColor }) => {
             <spotLight position={[10, 0, -15]} intensity={status === 'inactive' ? 0 : 0.5} castShadow />
             <ambientLight intensity={status === 'inactive' ? 0.3 : 0} castShadow />            
             <Logo />
+            
              <Suspense fallback={<Loader />}>
                 <group 
                     position={[-12, -7, -7]}
@@ -335,14 +336,14 @@ const Scene = ({ status, setStatus, carPosition, body, bodyColor }) => {
     );
 };
 
-const Loader = () => {
+const Loader = () => {    
     return (
-        <>            
-            <mesh>            
-                <boxGeometry args={[1, 1, 1]} />
-                <meshStandardMaterial color={'white'} />
-            </mesh>
-        </>        
+        <Html>
+            <div className="loader">                
+                <span className='loader_text'>Loading...</span>
+            </div>
+            
+        </Html>
     )
 }
 

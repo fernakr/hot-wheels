@@ -7,6 +7,28 @@
                 font-weight: bold;
                 src: url('./assets/fonts/AUdimat-Bold.ttf') format('truetype');
             }
+
+            .loader{                
+                background-color: #0000cc;                
+                width: 200px;
+                height: 240px;
+                background-image: url('./assets/images/loader.gif');                
+                background-blend-mode: multiply;
+                border-radius: 100%;
+            }   
+            
+            .loader_text{
+                font-family: 'Audimat-Bold', sans-serif;                                                           
+                color: #fff;
+                font-size: 30px;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 1;
+            }
+           
+
             body, html{
                 margin: 0;
             }
