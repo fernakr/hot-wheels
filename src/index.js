@@ -27,6 +27,23 @@ import { OrbitControls, Html, useAnimations, useGLTF } from '@react-three/drei'
 import * as THREE from 'three';
 import myFont from './flash_rogers.typeface.json';
 
+let wheels = [
+    {
+        id: 'default',
+        name: 'Wheels',
+        features: [
+            'Classic'
+        ]
+    },
+    {
+        id: 'oranges',
+        name: 'Oranges',
+        features: [
+            'Citrusy'
+        ]
+    }
+]
+
 let bodies = [
     {
         id: 'jordan',
@@ -130,7 +147,7 @@ const Ground = () => {
     </>)
 }
 
-const Configurator = ({ status, carPosition, body, bodyColor }) => {
+const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
 
 
 
@@ -170,14 +187,14 @@ const Configurator = ({ status, carPosition, body, bodyColor }) => {
         }
 
 
-        const Wheels = () => {
+        const Wheels = ({ wheel }) => {
             return (<>
                 <ModelViewer
-                    model="./assets/models/wheels.gltf"
+                    model={`./assets/models/wheels/${wheel.id}/wheels.gltf`}
                 />
                 <ModelViewer
                     position={[0, 0, 1]} scale={[0.8, 0.8, 0.8]}
-                    model="./assets/models/wheels-front.gltf"
+                    model={`./assets/models/wheels/${wheel.id}/wheels-front.gltf`}
                 />
             </>)
         };
@@ -209,7 +226,7 @@ const Configurator = ({ status, carPosition, body, bodyColor }) => {
         return (
             <animated.group rotation={rotation} position={position}>
                 <Spoiler/>
-                <Wheels />
+                <Wheels wheel={wheel} />
                 <Frame />
                 {/* <Interactive                    
                     onSelect={(event) => setBody(changeBody(body))}
@@ -293,7 +310,7 @@ const Track = () => {
   }
   
 
-const Scene = ({ status, setStatus, carPosition, body, bodyColor }) => {
+const Scene = ({ status, setStatus, carPosition, body, bodyColor, wheel }) => {
 
     
     useFrame(() => {
@@ -330,7 +347,7 @@ const Scene = ({ status, setStatus, carPosition, body, bodyColor }) => {
                     </Html>
                 }
 
-                <Configurator body={ body } bodyColor={ bodyColor } status={ status } carPosition={ carPosition} />            
+                <Configurator wheel={ wheel } body={ body } bodyColor={ bodyColor } status={ status } carPosition={ carPosition} />            
             </Suspense>
         </>
     );
@@ -471,17 +488,19 @@ const defaultPosition = {
 const App = () => {
     const [ status, setStatus ] = useState('inactive');
     const currBody = bodies[0];
-    const [body, setBody] = useState(currBody);
+    const [body, setBody] = useState(currBody);    
     const [bodyColor, setBodyColor] = useState('#ffffff');
+    const currWheel = wheels[0];
+    const [wheel, setWheel] = useState(currWheel);
 
-    const carPosition = [0, -12, -11];
-    console.log(bodyColor);
+    const carPosition = [0, -12, -10];
+    //console.log(bodyColor);
     return (
         <>
          { status === 'active' && body &&                  
                 <div className="details_wrapper">     
                     <h2>Body Type</h2>         
-                    <Carousel showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => setBody(bodies[index]) }>
+                    <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => setBody(bodies[index]) }>
                         { bodies.map((body, index) =>             
                                 (
                                     <div key={ index } className='details'>
@@ -496,7 +515,20 @@ const App = () => {
                         ) }
                     </Carousel>
                     <h2>Body Color</h2>                    
-                    <input type="color" defaultValue={ bodyColor } onChange={(e) => {console.log(e.target.value); setBodyColor(e.target.value)}}/>
+                    <input type="color" defaultValue={ bodyColor } onChange={(e) => {setBodyColor(e.target.value)}}/>
+                    <h2>Wheels</h2>
+                    <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => setWheel(wheels[index]) }>
+                        { wheels.map((setWheels, index) =>             
+                                (
+                                    <div key={ index } className='details'>
+                                        <h3>{ wheel.name }</h3>
+                                        <ul>                                                                  
+                                            { wheel.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                        
+                                        </ul>
+                                    </div>
+                                )
+                        ) }
+                    </Carousel>
                 </div>                
             }
              <Canvas        
@@ -516,7 +548,7 @@ const App = () => {
             {/* <XR> */}
                 {/* <Hands/>
                 <Controllers/> */}
-                <Scene body={ body } bodyColor={ bodyColor }status={ status } setStatus={ setStatus }  carPosition={ carPosition }/>
+                <Scene body={ body } bodyColor={ bodyColor } wheel={ wheel } status={ status } setStatus={ setStatus }  carPosition={ carPosition }/>
 
                 {/* <EffectComposer>
 

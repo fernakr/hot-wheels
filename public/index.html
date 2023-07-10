@@ -8,6 +8,25 @@
                 src: url('./assets/fonts/AUdimat-Bold.ttf') format('truetype');
             }
 
+            .carousel.carousel-slider .control-arrow{
+                opacity: 1 !important;
+            }
+
+            .carousel.carousel-slider .control-arrow:before{
+                border-width: 20px 8px !important;
+
+            }
+
+
+            .carousel.carousel-slider .control-prev:before{
+                border-right-color: yellow !important;                      
+            }
+
+          
+            .carousel.carousel-slider .control-next:before{
+                border-left-color: yellow !important;                     
+            }
+
             .loader{                
                 background-color: #0000cc;                
                 width: 200px;
@@ -38,6 +57,7 @@
                 --details-x-padding: 15px;
                 --details-y-padding: 10px;
                 --black: #333;
+                --details-offset: 30px;
 
             }
             .details_wrapper{
@@ -46,7 +66,7 @@
                 left: 50%;  
                 z-index: 1;
                 transform: translate(0, -50%);
-                width: 250px;
+                width: 280px;                
             }
 
             .details_wrapper h2{
@@ -57,6 +77,10 @@
                 text-shadow: 3px 3px 0px var(--black);
             }
 
+            .details_wrapper .carousel{
+                margin: 0 calc(-1 * var(--details-offset)) !important;
+            }
+
 
             .details{
                 font-family: 'Audimat-Bold', sans-serif;                                                           
@@ -65,6 +89,7 @@
                 border: var(--details-border) solid var(--black);
                 padding: var(--details-y-padding) var(--details-x-padding);                                       
                 font-size: 20px;
+                margin: 0 var(--details-offset);
 
             }
                 .details ul{
@@ -74,14 +99,16 @@
                     padding-left: 0;
                     list-style-type: none;
                     font-style: italic;
+                    line-height: 1;
                 }
                 .details li:not(:last-child){
-                    margin-bottom: 5px;
+                    margin-bottom: 10px;
                 }
                 .details h3{
                     margin: calc(-1 * var(--details-y-padding) - var(--details-border)) calc(-1 * var(--details-x-padding)) var(--details-y-padding);
                     background: var(--black);
                     color: white;
+                    line-height: 1;
                     padding: 10px 0 5px;
                     text-transform: uppercase;                                        
                     font-size: 24px;                    
