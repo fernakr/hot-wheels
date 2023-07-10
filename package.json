@@ -16,7 +16,8 @@
     "react-postprocessing": "^1.4.0",
     "react-responsive-carousel": "^3.2.23",
     "react-scripts": "^5.0.1",
-    "three": "^0.154.0"
+    "three": "^0.154.0",
+    "use-sound": "^4.0.1"
   },
   "devDependencies": {},
   "scripts": {

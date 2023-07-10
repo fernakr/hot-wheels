@@ -6,6 +6,8 @@ import { useSpring, a, animated, config } from '@react-spring/three'
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
 
+import useSound from 'use-sound';
+import hydraulicSfx from './hydraulic.mp3';
 
 
 import { VRButton, ARButton, XR, Controllers, Hands, Interactive } from '@react-three/xr'
@@ -268,7 +270,7 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
     const startCarPosition = [...carPosition ];
     startCarPosition[1] = -4;
 
-    const { position, rotation } = useSpring({ position: status === 'active' ? startCarPosition : carPosition, rotation: status === 'active' ? [0, 0, 0] : [0, Math.PI / 9, 0], config: { duration: 1000, tension: 300, friction: 20  }, // Set the duration to 1000 milliseconds (1 second)
+    const { position, rotation } = useSpring({ position: status === 'active' ? startCarPosition : carPosition, rotation: status === 'active' ? [0, 0, 0] : [0, Math.PI / 9, 0], config: { duration: 4000, tension: 300, friction: 20  }, // Set the duration to 1000 milliseconds (1 second)
     })
 
     return (
@@ -310,7 +312,7 @@ const Track = () => {
   }
   
 
-const Scene = ({ status, setStatus, carPosition, body, bodyColor, wheel }) => {
+const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor, wheel }) => {
 
     
     useFrame(() => {
@@ -343,7 +345,7 @@ const Scene = ({ status, setStatus, carPosition, body, bodyColor, wheel }) => {
                 <Ground />
                 { status != 'active' && 
                     <Html>
-                        <button className="start-button" onClick={() => setStatus('active')}>Build a Car</button>
+                        <button className="start-button" onClick={() =>{ setTimeout(() => playHydraulic(),500); setStatus('active')}}>Build a Car</button>
                     </Html>
                 }
 
@@ -492,7 +494,7 @@ const App = () => {
     const [bodyColor, setBodyColor] = useState('#ffffff');
     const currWheel = wheels[0];
     const [wheel, setWheel] = useState(currWheel);
-
+    const [playHydraulic] = useSound(hydraulicSfx, { volume: 0.5 })
     const carPosition = [0, -12, -10];
     //console.log(bodyColor);
     return (
@@ -548,7 +550,7 @@ const App = () => {
             {/* <XR> */}
                 {/* <Hands/>
                 <Controllers/> */}
-                <Scene body={ body } bodyColor={ bodyColor } wheel={ wheel } status={ status } setStatus={ setStatus }  carPosition={ carPosition }/>
+                <Scene playHydraulic={ playHydraulic } body={ body } bodyColor={ bodyColor } wheel={ wheel } status={ status } setStatus={ setStatus }  carPosition={ carPosition }/>
 
                 {/* <EffectComposer>
 
