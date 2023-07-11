@@ -10,6 +10,8 @@ import './index.scss';
 
 import useSound from 'use-sound';
 import hydraulicSfx from './hydraulic.mp3';
+import hatchSfx from './hatch.m4a';
+import spraySfx from './spray.m4a';
 
 
 import { VRButton, ARButton, XR, Controllers, Hands, Interactive } from '@react-three/xr'
@@ -509,6 +511,8 @@ const App = () => {
     const currWheel = wheels[0];
     const [wheel, setWheel] = useState(currWheel);
     const [playHydraulic] = useSound(hydraulicSfx, { volume: 0.5 })
+    const [playHatch] = useSound(hatchSfx, { volume: 0.5 })
+    const [playSpray] = useSound(spraySfx, { volume: 0.5 })
     const carPosition = [0, -12, -10];
     //console.log(bodyColor);
     const panels = [
@@ -529,7 +533,7 @@ const App = () => {
                         { activePanel === 0 &&
                             <div className="panel">
                                 <h2>Body Type</h2>         
-                                <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => setBody(bodies[index]) }>
+                                <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setBody(bodies[index])} }>
                                     { bodies.map((body, index) =>             
                                             (
                                                 <div key={ index } className='details'>
@@ -544,13 +548,13 @@ const App = () => {
                                     ) }
                                 </Carousel>
                                 <h2>Body Color</h2>                    
-                                <input type="color" defaultValue={ bodyColor } onChange={(e) => {setBodyColor(e.target.value)}}/>
+                                <input type="color" defaultValue={ bodyColor } onChange={(e) => {playSpray(); setBodyColor(e.target.value)}}/>
                             </div>
                         }
                             { activePanel === 1 &&
                             <div className="panel">
                                 <h2>Wheels</h2>
-                                <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => setWheel(wheels[index]) }>
+                                <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setWheel(wheels[index])} }>
                                     { wheels.map((setWheels, index) =>             
                                             (
                                                 <div key={ index } className='details'>
