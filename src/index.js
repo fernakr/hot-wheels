@@ -50,14 +50,14 @@ let wheels = [
             'Citrusy'
         ]
     },
-    {
-        id: 'tentacles',
-        name: 'Tentacles',
-        front: false,
-        features: [
-            'Citrusy'
-        ]
-    }
+    // {
+    //     id: 'tentacles',
+    //     name: 'Tentacles',
+    //     front: false,
+    //     features: [
+    //         'Citrusy'
+    //     ]
+    // }
 ]
 
 let bodies = [
@@ -66,19 +66,19 @@ let bodies = [
         name: 'Michael Jordan Head',
         speed: 9,
         agility: 8,
-        features: [
-            '6 NBA Championships',
-            '5 MVP Awards',
+        specialMove: 'Tongue out, leap over obstacles',     
+        features: [                    
+            'Can also golf and play baseball'
         ]
     }, 
     {
         id: 'heart',
         name: 'Human Heart',
-        speed: 9,
-        agility: 8,
+        speed: 5,
+        agility: 3,
+        specialMove: 'Pump blood',
         features: [
-            'Keeps you alive',
-            '5 MVP Awards',
+            'Keeps you alive'            
         ]
     }, 
     {
@@ -86,30 +86,27 @@ let bodies = [
         name: 'Kitten',
         speed: 9,
         agility: 8,
+        specialMove: 'Cuteness overload',
         features: [
-            '6 NBA Championships',
-            '5 MVP Awards',
+            'Kneads',
         ]
     },
     {
         id: 'nugget',
         name: 'Chicken Nugget',
-        speed: 9,
-        agility: 8,
-        features: [
-            '6 NBA Championships',
-            '5 MVP Awards',
+        speed: 3,
+        agility: 3,
+        specialMove: 'Barbeque sauce sploosh',
+        features: [            
+            'Will never decompose',
         ]
     }, 
     {
         id: 'torso',
         name: 'Torso',
-        speed: 9,
-        agility: 8,
-        features: [
-            '6 NBA Championships',
-            '5 MVP Awards',
-        ]
+        speed: 3,
+        agility: 5,    
+        specialMove: 'Pectoral flex'
     }
 ];
 
@@ -125,7 +122,7 @@ const Logo = () => {
     let taglineFont = fontLoader.parse(myFont);
     const taglineArgs = [`"We'll make a car\n out of anything!!"`, { font: taglineFont, size: 0.7, height: .01 }];
     extend({ TextGeometry });
-    return (<group position={[0, -1, -14]}>
+    return (<group position={[0, 2, -14]}>
         <ModelViewer
             model="./assets/models/hotwheels.gltf"
 
@@ -134,7 +131,7 @@ const Logo = () => {
         {/* Add text  */}
         
         {taglineFont &&
-            <group position={[-1, 4.5, 0]}>
+            <group position={[-1, 3.5, 0]}>
                 <mesh >
                     <textGeometry attach="geometry" args={taglineArgs} />
                     <meshStandardMaterial attach="material" color="white" />
@@ -536,13 +533,17 @@ const App = () => {
                                 <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setBody(bodies[index])} }>
                                     { bodies.map((body, index) =>             
                                             (
-                                                <div key={ index } className='details'>
+                                                <div className='details'>
                                                     <h3>{ body.name }</h3>
-                                                    <ul>
-                                                        { body.speed && <li>Speed: { body.speed }</li> }
-                                                        { body.agility && <li>Agility: { body.agility }</li> }                            
-                                                        { body.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                        
-                                                    </ul>
+                                                    
+                                                    <div key={ index } className='details_body'>                                                    
+                                                        <ul>
+                                                            { body.speed && <li>Speed: { body.speed }</li> }
+                                                            { body.agility && <li>Agility: { body.agility }</li> }                            
+                                                            { body.specialMove && <li>Special Move: { body.specialMove }</li> }
+                                                            { body.features && body.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                        
+                                                        </ul>
+                                                    </div>
                                                 </div>
                                             )
                                     ) }
@@ -555,7 +556,7 @@ const App = () => {
                             <div className="panel">
                                 <h2>Wheels</h2>
                                 <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setWheel(wheels[index])} }>
-                                    { wheels.map((setWheels, index) =>             
+                                    { wheels.map((wheel, index) =>             
                                             (
                                                 <div key={ index } className='details'>
                                                     <h3>{ wheel.name }</h3>

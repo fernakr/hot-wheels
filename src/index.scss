@@ -13,7 +13,15 @@ $border-left-color_1: yellow;
 	font-weight: bold;
 	src: url('./assets/fonts/AUdimat-Bold.ttf') format('truetype');
 }
-.carousel.carousel-slider {
+
+:root {
+	--details-border: 10px;
+	--details-x-padding: 15px;
+	--details-y-padding: 10px;
+	--black: #333;
+	--details-offset: 30px;
+}
+.carousel.carousel-slider {	
 	.control-arrow {
 		opacity: 1 !important;
 		&:before {
@@ -56,13 +64,7 @@ body {
 html {
 	margin: 0;
 }
-:root {
-	--details-border: 10px;
-	--details-x-padding: 15px;
-	--details-y-padding: 10px;
-	--black: #333;
-	--details-offset: 30px;
-}
+
 .details {
     &_wrapper {
         position: fixed;
@@ -80,16 +82,25 @@ html {
         }
         .carousel {
             margin: 0 calc(-1 * var(--details-offset)) !important;
+		}
+		.slide{
+			box-sizing: border-box;
+			//padding-bottom:  var(--details-border);
         }
     }
 	font-family: $font-family_1;
 	color: $color_3;
-	background: #fff;
-	border: var(--details-border) solid var(--black);
-	padding: var(--details-y-padding) var(--details-x-padding);
+
 	font-size: 20px;
 	margin: 0 var(--details-offset);
 	box-sizing: border-box;
+	&_body{
+		background: #fff;
+		border: var(--details-border) solid var(--black);
+		border-top: 0;
+		padding: var(--details-y-padding) var(--details-x-padding);
+	}
+
 	ul {
 		margin-top: 0;
 		margin-left: 0;
@@ -105,7 +116,8 @@ html {
 		}
 	}
 	h3 {
-		margin: calc(-1 * var(--details-y-padding) - var(--details-border)) calc(-1 * var(--details-x-padding)) var(--details-y-padding);
+		margin: 0;
+		//margin: calc(-1 * var(--details-y-padding) - var(--details-border)) calc(-1 * var(--details-x-padding)) var(--details-y-padding);
 		background: var(--black);
 		color: $color_4;
 		line-height: 1;
@@ -115,16 +127,22 @@ html {
 	}
     &_nav{
         border-top: 2px solid $color_2;
-        margin-top: 10px;
+        margin-top: 20px;
         button{
             background: none;
             border: none;
             font-size: 20px;
             color: $color_2;
-            cursor: pointer;            
+			padding: 10px 10px;
+			font-weight: bold;
+            cursor: pointer;      
+			margin-right: 10px;      
             &:disabled{
                 color: $color_3;
             }
+			// &:not(.is-active){
+			// 	margin-left: 10px;
+			// }
             &.is-active{
                 background: $color_2;
                 color: $color_3;
