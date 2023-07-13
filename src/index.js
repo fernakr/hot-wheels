@@ -217,8 +217,9 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
         const Spoiler = () => {
             return (
                 <>
-                    <Axel position={[0, 1.5, 0]} rotation={[-Math.PI / 8, 0, 0]} size={1} />
-                    <Axel position={[1, 1.5, 0]} rotation={[-Math.PI / 8, 0, 0]} size={1} />
+                    {Array.from({ length: 2 }).map((_, i) =>
+                    <Axel position={[i*1 - 0.75, 1, -1.75]} rotation={[-Math.PI / 8, 0, 0]} size={2} />
+                    )}
                     <group position={[-0.5, 3.2, -3]} >
                         <mesh rotation={[Math.PI / 10, 0, 0]}  material={ new THREE.MeshLambertMaterial({color: bodyColor}) }>
                             <boxGeometry args={[6, .1, 1.5]} />                            
@@ -469,7 +470,7 @@ const defaultPosition = {
 
     
     const closeBy = {
-        position: [5, 0, 0],
+        position: [5, 0, 2],
         target: targetPosition
     };
     
@@ -510,7 +511,7 @@ const App = () => {
     const [playHydraulic] = useSound(hydraulicSfx, { volume: 0.5 })
     const [playHatch] = useSound(hatchSfx, { volume: 0.5 })
     const [playSpray] = useSound(spraySfx, { volume: 0.5 })
-    const carPosition = [0, -12, -10];
+    const carPosition = [0, -12, -7];
     //console.log(bodyColor);
     const panels = [
         {
