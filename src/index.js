@@ -36,7 +36,7 @@ import myFont from './flash_rogers.typeface.json';
 let wheels = [
     {
         id: 'default',
-        name: 'Wheels',
+        name: 'Just Regular Ol\' Wheels',
         front: true,
         features: [
             'Classic'
@@ -283,7 +283,7 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
     const startCarPosition = [...carPosition ];
     startCarPosition[1] = -4;
 
-    const { position, rotation } = useSpring({ position: status === 'active' ? startCarPosition : carPosition, rotation: status === 'active' ? [0, 0, 0] : [0, Math.PI / 9, 0], config: { duration: 4000, tension: 300, friction: 20  }, // Set the duration to 1000 milliseconds (1 second)
+    const { position, rotation } = useSpring({ position: status === 'active' ? startCarPosition : carPosition, rotation: status === 'active' ? [0, Math.PI / 15, 0] : [0, - Math.PI / 9, 0], config: { duration: 4000, tension: 300, friction: 20  }, // Set the duration to 1000 milliseconds (1 second)
     })
 
     return (
@@ -341,7 +341,7 @@ const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor,
             </animated.group> */}
 
             <pointLight position={[-10, 10, -10]} radius={10} intensity={0.5} castShadow />
-            <pointLight position={[10, -10, 10]} intensity={1} castShadow />
+            <pointLight position={[15, 0, 10]} intensity={1} castShadow />
             <spotLight position={[10, 0, -15]} intensity={status === 'inactive' ? 0 : 0.5} castShadow />
             <ambientLight intensity={status === 'inactive' ? 0.3 : 0} castShadow />            
             <Logo />
@@ -539,10 +539,14 @@ const App = () => {
                                                     
                                                     <div key={ index } className='details_body'>                                                    
                                                         <ul>
-                                                            { body.speed && <li>Speed: { body.speed }</li> }
-                                                            { body.agility && <li>Agility: { body.agility }</li> }                            
-                                                            { body.specialMove && <li>Special Move: { body.specialMove }</li> }
-                                                            { body.features && body.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                        
+                                                            { body.speed && <li><span className='label'>Speed:</span> { body.speed }</li> }
+                                                            { body.agility && <li><span className='label'>Agility:</span> { body.agility }</li> }                            
+                                                            { body.specialMove && <li className='small'><span className='label display-block'>Special Move:</span> { body.specialMove }</li> }
+                                                            { body.features && <li className='small'><span className='label display-block'>Features:</span>
+                                                                <ul>
+                                                                    { body.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                                                                                        
+                                                                </ul>
+                                                            </li> }
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -559,11 +563,14 @@ const App = () => {
                                 <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setWheel(wheels[index])} }>
                                     { wheels.map((wheel, index) =>             
                                             (
+
                                                 <div key={ index } className='details'>
                                                     <h3>{ wheel.name }</h3>
-                                                    <ul>                                                                  
-                                                        { wheel.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                        
-                                                    </ul>
+                                                    <div className="details_body">
+                                                        <ul>                                                                  
+                                                            { wheel.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                        
+                                                        </ul>
+                                                    </div>
                                                 </div>
                                             )
                                     ) }
