@@ -203,7 +203,7 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
         const Wheels = ({ wheel }) => {
             return (<>
                 <ModelViewer                    
-                
+
                     position={[0, 0, 0]}
                     model={`./assets/models/wheels/${wheel.id}/wheels.gltf`}
                 />
@@ -220,9 +220,9 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
             return (
                 <>
                     {Array.from({ length: 2 }).map((_, i) =>
-                    <Axel position={[i*1 - 0.75, 1, -1.75]} rotation={[-Math.PI / 8, 0, 0]} size={2} />
+                    <Axel position={[-0.25 + 0.75 * i, 1, -1.75]} rotation={[-Math.PI / 8, 0, 0]} size={2} />
                     )}
-                    <group position={[-0.5, 3.2, -3]} >
+                    <group position={[0, 3.2, -3]} >
                         <mesh rotation={[Math.PI / 10, 0, 0]}  material={ new THREE.MeshLambertMaterial({color: bodyColor}) }>
                             <boxGeometry args={[6, .1, 1.5]} />                            
                         </mesh>
@@ -235,8 +235,11 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
                 <group>
                     <Axel position={[0, 0, 3]} rotation={[0, 0, Math.PI / 2]} size={2} />
                     <Axel position={[0, 0.5, 0]} rotation={[0, 0, Math.PI / 2]} />
-                    <Axel position={[-0.25, 0, 0]} size={6} />
-                    <Axel position={[0.5, 0, 0]} size={6} />
+                    { Array.from({ length: 2 }).map((_, i) =>
+                    (
+                        <Axel position={[-0.25 + 0.75 * i, 0, 0.75]} size={4.5} />
+                    ))}
+                    
                 </group>
             )
         }
