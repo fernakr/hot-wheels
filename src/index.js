@@ -110,7 +110,7 @@ let bodies = [
     }
 ];
 
-const ModelViewer = ({ model, position, rotation, scale, clickHandler, visible = true }) => {
+const ModelViewer = ({ model, position, rotation, scale, clickHandler }) => {
     const gltf = useLoader(GLTFLoader, model)
     // apply position to model
     //const animations = useAnimations(gltf.animations);
@@ -202,7 +202,9 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
 
         const Wheels = ({ wheel }) => {
             return (<>
-                <ModelViewer
+                <ModelViewer                    
+                
+                    position={[0, 0, 0]}
                     model={`./assets/models/wheels/${wheel.id}/wheels.gltf`}
                 />
                 { wheel.front && <ModelViewer
@@ -239,15 +241,11 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
             )
         }
         return (
-            <animated.group rotation={rotation} position={position}>
+            <animated.group rotation={rotation} position={position} >
                 <Spoiler/>
                 <Wheels wheel={wheel} />
-                <Frame />
-                {/* <Interactive                    
-                    onSelect={(event) => setBody(changeBody(body))}
-                    > */}
-                    <Body body={body}  />
-                {/* </Interactive> */}
+                <Frame />                
+                <Body body={body}  />            
                 <Base />
             </animated.group>
         )
@@ -263,15 +261,13 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
     // on click change body
 
 
-    const Body = ({ position, body, rotation, scale }) => {
+    const Body = ({ position = [0,0,0], body, rotation, scale }) => {
 
 
 
 
         return (<>
-            <ModelViewer
-                visible={ true }
-                //clickHandler={() => setBody(changeBody(body))}
+            <ModelViewer                                
                 model={`./assets/models/body/${body.id}.gltf`}
                 position={position}
                 rotation={rotation}
@@ -288,24 +284,38 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
 
     return (
         <>
-            <Car status={ status } body={body} bodyColor={ bodyColor} position={position} rotation={ rotation } />           
-            {/* <ModelPreload changeBody={ changeBody } body={ body } position={position} rotation={[0, -Math.PI / 9, 0]} /> */}
+            <Car status={ status } body={body} bodyColor={ bodyColor} position={position} rotation={ rotation } />                       
         </>
     )
 }
 
-const ModelPreload = ({ body, changeBody, position, rotation }) => {
-    // preload next body
-    
-    let nextBody = changeBody(body);
-    //console.log(nextBody   )
-    return (<>
-        <ModelViewer
-            rotation={rotation}            
-            position={position} 
-            model={`./assets/models/body/${nextBody.id}.gltf`}
-        />
-    </>)
+const BodyPreload = () => {    
+    return bodies.map((body) => {   
+        
+        return (
+                    
+            <ModelViewer            
+                position={ [-100, -100, 0] }                
+                model={`./assets/models/body/${body.id}.gltf`}
+            />        
+        )})
+        
+}
+
+const WheelPreload = () => {    
+    return wheels.map((wheel) => {      
+        let wheelTypes = [''];
+        if (wheel.front) {
+            wheelTypes = wheelTypes.concat('-front');
+        }
+
+        return wheelTypes.map((wheelType) => (                    
+            <ModelViewer            
+                position={ [-100, -100, 0] }                
+                model={`./assets/models/wheels/${wheel.id}/wheels${wheelType}.gltf`}
+            />        
+        ))})
+        
 }
 
 const Track = () => {
@@ -340,6 +350,8 @@ const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor,
                 <Controls/>
             </animated.group> */}
 
+            <BodyPreload  />
+            <WheelPreload />
             <pointLight position={[-10, 10, -10]} radius={10} intensity={0.5} castShadow />
             <pointLight position={[15, 0, 10]} intensity={1} castShadow />
             <spotLight position={[10, 0, -15]} intensity={status === 'inactive' ? 0 : 0.5} castShadow />
@@ -464,13 +476,13 @@ const defaultPosition = {
 
 
     let targetPosition = [...carPosition]
-    targetPosition[0] = targetPosition[0] + 4.5;
+    targetPosition[0] = targetPosition[0] + 3.5;
     targetPosition[1] = targetPosition[1] + 12;
     targetPosition[2] = targetPosition[2] -7;
 
     
     const closeBy = {
-        position: [5, 0, 2],
+        position: [3, 0, 2],
         target: targetPosition
     };
     

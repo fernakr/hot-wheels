@@ -77,7 +77,8 @@ html {
             color: $color_2;
             font-family: $font-family_1;
             font-size: 30px;
-            margin-bottom: 10px;
+			margin-top: 15px;
+            margin-bottom: 10px;			
             text-shadow: 3px 3px 0px var(--black);
         }
         .carousel {
@@ -145,7 +146,7 @@ html {
 	}
     &_nav{
         border-top: 2px solid $color_2;
-        margin-top: 20px;
+        margin-top: 30px;
         button{
             background: none;
             border: none;
