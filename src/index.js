@@ -352,9 +352,10 @@ const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor,
             {/* <animated.group position={position}>
                 <Controls/>
             </animated.group> */}
-
+            <Suspense fallback={<Loader />}>
             <BodyPreload  />
             <WheelPreload />
+            </Suspense>
             <pointLight position={[-10, 10, -10]} radius={10} intensity={0.5} castShadow />
             <pointLight position={[15, 0, 10]} intensity={1} castShadow />
             <spotLight position={[10, 0, -15]} intensity={status === 'inactive' ? 0 : 0.5} castShadow />
