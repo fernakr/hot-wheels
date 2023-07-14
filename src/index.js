@@ -265,18 +265,14 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
 
 
     const Body = ({ position = [0,0,0], body, rotation, scale }) => {
-
-
-
-
-        return (<>
+        return (
             <ModelViewer                                
                 model={`./assets/models/body/${body.id}.gltf`}
                 position={position}
                 rotation={rotation}
                 scale={scale}
             />
-        </>)
+        )
     };
 
     const startCarPosition = [...carPosition ];
@@ -285,10 +281,8 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
     const { position, rotation } = useSpring({ position: status === 'active' ? startCarPosition : carPosition, rotation: status === 'active' ? [0, Math.PI / 15, 0] : [0, - Math.PI / 9, 0], config: { duration: 4000, tension: 300, friction: 20  }, // Set the duration to 1000 milliseconds (1 second)
     })
 
-    return (
-        <>
-            <Car status={ status } body={body} bodyColor={ bodyColor} position={position} rotation={ rotation } />                       
-        </>
+    return (        
+        <Car status={ status } body={body} bodyColor={ bodyColor} position={position} rotation={ rotation } />
     )
 }
 
@@ -348,36 +342,29 @@ const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor,
 
 
     return (
-        <>
-            {/* <animated.group position={position}>
-                <Controls/>
-            </animated.group> */}
+        <>            
             <Suspense fallback={<Loader />}>
-            <BodyPreload  />
-            <WheelPreload />
+                <BodyPreload  />
+                <WheelPreload />
             </Suspense>
             <pointLight position={[-10, 10, -10]} radius={10} intensity={0.5} castShadow />
             <pointLight position={[15, 0, 10]} intensity={1} castShadow />
             <spotLight position={[10, 0, -15]} intensity={status === 'inactive' ? 0 : 0.5} castShadow />
             <ambientLight intensity={status === 'inactive' ? 0.3 : 0} castShadow />            
-            <Logo />
-            
-             <Suspense fallback={<Loader />}>
+            <Logo />            
+            <Suspense fallback={<Loader />}>
                 <group 
                     position={[-12, -7, -7]}
                     rotation={[0,Math.PI/3,0]}
                     scale={[52,52,52]} >
                     <Track/>
-                </group>
-                                
-                
+                </group>                                        
                 <Ground />
                 { status != 'active' && 
                     <Html>
                         <button className="start-button" onClick={() =>{ setTimeout(() => playHydraulic(),500); setStatus('active')}}>Build a Car</button>
                     </Html>
-                }
-
+                }                
                 <Configurator wheel={ wheel } body={ body } bodyColor={ bodyColor } status={ status } carPosition={ carPosition} />            
             </Suspense>
         </>
@@ -541,7 +528,7 @@ const App = () => {
     ];
     return (
         <>
-         { status === 'active' && body &&                  
+            { status === 'active' && body &&                  
                 <div className="details_wrapper">     
                     <div className="details_content">
                         { activePanel === 0 &&
@@ -602,11 +589,14 @@ const App = () => {
                         ) }
 
 
-                    </div>
+                    </div>                    
+                    <button className="start-button" onClick={() =>{ setTimeout(() => playHydraulic(),500); setStatus('staging')}}>Ready for Photos!</button>
                 </div>                
+                
             }
-             <Canvas        
-            onCreated={({ gl }) => {
+            
+            <Canvas        
+                onCreated={({ gl }) => {
                 gl.setClearColor(new THREE.Color(0x0000cc));
             }}>
             <OrbitControls makeDefault                   
