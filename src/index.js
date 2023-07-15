@@ -33,7 +33,7 @@ import { OrbitControls, Html, useAnimations, useGLTF } from '@react-three/drei'
 import * as THREE from 'three';
 import myFont from './flash_rogers.typeface.json';
 
-let wheels = [
+const wheels = [
     {
         id: 'default',
         name: 'Just Regular Ol\' Wheels',
@@ -60,7 +60,7 @@ let wheels = [
     // }
 ]
 
-let bodies = [
+const bodies = [
     {
         id: 'jordan',
         name: 'Michael Jordan Head',
@@ -110,6 +110,13 @@ let bodies = [
     }
 ];
 
+const pizzazzes = [
+    {
+        id: 'none',
+        name: 'None',
+    }
+]
+
 const ModelViewer = ({ model, position, rotation, scale, clickHandler }) => {
     const gltf = useLoader(GLTFLoader, model)
     // apply position to model
@@ -117,50 +124,106 @@ const ModelViewer = ({ model, position, rotation, scale, clickHandler }) => {
     return <primitive castShadow onClick={clickHandler} object={gltf.scene} position={position} rotation={rotation} scale={scale} />
 }
 
-const Logo = () => {
+const Logo = ({ status }) => {
     let fontLoader = new FontLoader();
-    let taglineFont = fontLoader.parse(myFont);
-    const taglineArgs = [`"We'll make a car\n out of anything!!"`, { font: taglineFont, size: 0.7, height: .01 }];
-    extend({ TextGeometry });
-    return (<group position={[0, 2, -14]}>
-        <ModelViewer
-            model="./assets/models/hotwheels.gltf"
+    let textFont = fontLoader.parse(myFont);
 
-            rotation={[Math.PI / 20, 0, 0]}
-        />
-        {/* Add text  */}
+    const textOutput = [
+        {
+            text: 'The',
+            size: 1,
+            position: [-7, 6.8, -2]       
+        },
+        {
+
+            text: `"We'll make a car\n out of anything!!"`, 
+            size: 0.7,
+            position: [-3.25, 3.5, -2],
+            color: '#EDD469'
+        },
+
+        {
+            text: 'Build-a-Car Portrait Studio',
+            size: 0.5,
+            position: [-3, 1.5, -2],
+            color: '#DC803D'
+        }        
         
-        {taglineFont &&
-            <group position={[-1, 3.5, 0]}>
-                <mesh >
-                    <textGeometry attach="geometry" args={taglineArgs} />
-                    <meshStandardMaterial attach="material" color="white" />
-                </mesh>
-                <mesh position={[0.1,-0.1,-0.1]}>
-                    <textGeometry attach="geometry" args={taglineArgs} />
-                    <meshStandardMaterial attach="material" color="navy" />
-                </mesh>
-            </group>
+    ]    
+    extend({ TextGeometry });
+        
+    
+    const springText = useSpring({
+        position: status === 'inactive' ? [0,0,0] : [0,40,0],
+        config: { duration: 250, tension: 30, friction: 20  }
+    });
+
+    const springLogo = useSpring({
+        position: status === 'staging' ? [-3, -1, -8] : [0, 3, -14],
+        rotation: status === 'staging' ? [0, Math.PI / 15, 0] : [Math.PI / 20, 0, 0],
+        config: { duration: 1000, tension: 30, friction: 20  }
+        
+    });
+
+
+    //console.log(position);
+    return (<animated.group position={springLogo.position} rotation={springLogo.rotation}>
+        <ModelViewer
+            model="./assets/models/hotwheels.gltf"            
+        />        
+        
+        {textFont &&
+            <animated.group position={ springText.position }>
+                { textOutput.map((text, i) => (           
+                    <group key={ i } position={text.position}>
+                        <mesh >
+                            <textGeometry attach="geometry" args={                            
+                                [text.text,{
+                                    font: textFont,
+                                    size: text.size,
+                                    height: .01
+                                }]
+                            } />
+                            <meshStandardMaterial attach="material" color={ text.color ? text.color : 'white' }  />
+                        </mesh>
+                        <mesh position={[0.05,-0.05,-0.05]}>
+                            <textGeometry attach="geometry"  args={                            
+                                [text.text,{
+                                    font: textFont,
+                                    size: text.size,
+                                    height: .01
+                                }]} 
+                            />
+                            <meshStandardMaterial attach="material" color="navy" />
+                        </mesh>
+                    </group>
+                ))}
+            </animated.group>
         }
+        
 
 
 
-    </group>)
+    </animated.group>)
 };
 
 
-const Ground = () => {
-    extend({ PlaneGeometry })
+const Ground = ({ stageColor }) => {
+    extend({ PlaneGeometry });
+    // darken color value
+    const color = new THREE.Color(stageColor);
+    color.offsetHSL(0, 0, -0.1);
+
     return (<>
         <mesh position={[0, -7, -4]} rotation={[-Math.PI/2,0,0]}>
 
             <planeGeometry attach="geometry" args={[100, 100]} />
-            <meshPhongMaterial roughness={0} clearcoat={0} attach="material" color="#333399" />
+            <meshPhongMaterial roughness={0} clearcoat={0} attach="material" color={ color } />
         </mesh>
     </>)
 }
 
-const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
+const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, baseColor }) => {
 
 
 
@@ -169,24 +232,19 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
         return (<>
             <mesh receiveShadow position={[0, 0, 0]} rotation={[0, 0, 0]}  >            
                 <cylinderGeometry attach="geometry" args={[4, 4.25, 0.4, 50, 2]} />
-                <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color="#999" roughness={0} />
+                <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color={ baseColor } roughness={0} />
             </mesh>
             <mesh receiveShadow position={[0, -2, 0]} rotation={[0, 0, 0]}  >
 
                 <shadowMaterial opacity={1} />
                 <cylinderGeometry attach="geometry" args={[4.25, 4.25, 3.6, 50, 4]} />
-                <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color="#999" roughness={0} />
+                <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color={ baseColor }roughness={0} />
             </mesh>
         </>)
     };
     
     const Car = ({ position, rotation, body, bodyColor, carPosition }) => {
-        // console.log(bodyColor);
-        // let material = new THREE.MeshLambertMaterial({color: bodyColor})
-        // useEffect(() => {
-        //     material = );            
-        //     console.log(material);
-        //   }, [bodyColor])
+        
         
         const Axel = ({ position, rotation = [Math.PI / 2, 0, 0], size = 4 }) => {
             extend({ CylinderGeometry })
@@ -220,7 +278,7 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
             return (
                 <>
                     {Array.from({ length: 2 }).map((_, i) =>
-                    <Axel position={[-0.25 + 0.75 * i, 1, -1.75]} rotation={[-Math.PI / 8, 0, 0]} size={2} />
+                    <Axel key={ i } position={[-0.25 + 0.75 * i, 1, -1.75]} rotation={[-Math.PI / 8, 0, 0]} size={2} />
                     )}
                     <group position={[0, 3.2, -3]} >
                         <mesh rotation={[Math.PI / 10, 0, 0]}  material={ new THREE.MeshLambertMaterial({color: bodyColor}) }>
@@ -237,7 +295,7 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
                     <Axel position={[0, 0.5, 0]} rotation={[0, 0, Math.PI / 2]} />
                     { Array.from({ length: 2 }).map((_, i) =>
                     (
-                        <Axel position={[-0.25 + 0.75 * i, 0, 0.75]} size={4.5} />
+                        <Axel key={ i } position={[-0.25 + 0.75 * i, 0, 0.75]} size={4.5} />
                     ))}
                     
                 </group>
@@ -278,7 +336,10 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
     const startCarPosition = [...carPosition ];
     startCarPosition[1] = -4;
 
-    const { position, rotation } = useSpring({ position: status === 'active' ? startCarPosition : carPosition, rotation: status === 'active' ? [0, Math.PI / 15, 0] : [0, - Math.PI / 9, 0], config: { duration: 4000, tension: 300, friction: 20  }, // Set the duration to 1000 milliseconds (1 second)
+    const { position, rotation } = useSpring(
+            { 
+                    position: status !== 'inactive' ? startCarPosition : carPosition, rotation: status !== 'inactive' ? [0, Math.PI / 15, 0] : [0, - Math.PI / 9, 0], 
+                    config: { duration: 4000, tension: 300, friction: 20  }, // Set the duration to 1000 milliseconds (1 second)
     })
 
     return (        
@@ -287,11 +348,12 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel }) => {
 }
 
 const BodyPreload = () => {    
-    return bodies.map((body) => {   
+    return bodies.map((body, i) => {   
         
         return (
                     
-            <ModelViewer            
+            <ModelViewer    
+                key={ i }        
                 position={ [-100, -100, 0] }                
                 model={`./assets/models/body/${body.id}.gltf`}
             />        
@@ -300,14 +362,15 @@ const BodyPreload = () => {
 }
 
 const WheelPreload = () => {    
-    return wheels.map((wheel) => {      
+    return wheels.map((wheel, i) => {      
         let wheelTypes = [''];
         if (wheel.front) {
             wheelTypes = wheelTypes.concat('-front');
         }
 
-        return wheelTypes.map((wheelType) => (                    
+        return wheelTypes.map((wheelType, i) => (                    
             <ModelViewer            
+                key={ i }
                 position={ [-100, -100, 0] }                
                 model={`./assets/models/wheels/${wheel.id}/wheels${wheelType}.gltf`}
             />        
@@ -332,7 +395,7 @@ const Track = () => {
   }
   
 
-const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor, wheel }) => {
+const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor, wheel, stageColor, baseColor }) => {
 
     
     useFrame(() => {
@@ -351,7 +414,7 @@ const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor,
             <pointLight position={[15, 0, 10]} intensity={1} castShadow />
             <spotLight position={[10, 0, -15]} intensity={status === 'inactive' ? 0 : 0.5} castShadow />
             <ambientLight intensity={status === 'inactive' ? 0.3 : 0} castShadow />            
-            <Logo />            
+            <Logo status={ status } />            
             <Suspense fallback={<Loader />}>
                 <group 
                     position={[-12, -7, -7]}
@@ -359,13 +422,13 @@ const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor,
                     scale={[52,52,52]} >
                     <Track/>
                 </group>                                        
-                <Ground />
-                { status != 'active' && 
+                <Ground stageColor={ stageColor } />
+                { status === 'inactive' && 
                     <Html>
                         <button className="start-button" onClick={() =>{ setTimeout(() => playHydraulic(),500); setStatus('active')}}>Build a Car</button>
                     </Html>
                 }                
-                <Configurator wheel={ wheel } body={ body } bodyColor={ bodyColor } status={ status } carPosition={ carPosition} />            
+                <Configurator baseColor={ baseColor} wheel={ wheel } body={ body } bodyColor={ bodyColor } status={ status } carPosition={ carPosition} />            
             </Suspense>
         </>
     );
@@ -472,22 +535,34 @@ const defaultPosition = {
     targetPosition[2] = targetPosition[2] -7;
 
     
-    const closeBy = {
+    const buildCameraPos = {
         position: [3, 0, 2],
         target: targetPosition
     };
     
-    const farAway = {
+    const inactiveCameraPos = {
         position: [-3, 0, 10],
         target: [0,0,-10]
+    };
+
+    const stagingTargetPosition = [...carPosition];
+    stagingTargetPosition[1] = stagingTargetPosition[1] + 12;
+    //stagingTargetPosition[0] = stagingTargetPosition[0] - 4;
+
+    const stagingCameraPos = {
+        position: [4, 0, 2],
+        target: stagingTargetPosition
     };
     const [cameraSettings, setCameraSettings] = useState(defaultPosition);
   
     useEffect(() => {
-      if (status === 'active') {
-        setCameraSettings(closeBy);
+      // switch statement
+      if (status === 'staging') {
+        setCameraSettings(stagingCameraPos);
+      }else if (status !== 'inactive') {
+        setCameraSettings(buildCameraPos);
       } else {
-        setCameraSettings(farAway);
+        setCameraSettings(inactiveCameraPos);
       }
     }, [status]);
   
@@ -511,11 +586,14 @@ const App = () => {
     const [bodyColor, setBodyColor] = useState('#ffffff');
     const currWheel = wheels[0];
     const [wheel, setWheel] = useState(currWheel);
+    const currPizzazz = pizzazzes[0];
+    const [pizzazz, setPizzazz] = useState(currPizzazz);
     const [playHydraulic] = useSound(hydraulicSfx, { volume: 0.5 })
     const [playHatch] = useSound(hatchSfx, { volume: 0.5 })
-    const [playSpray] = useSound(spraySfx, { volume: 0.5 })
+    const [playSpray] = useSound(spraySfx, { volume: 0.25 })
     const carPosition = [0, -12, -7];
-    //console.log(bodyColor);
+    const [stageColor, setStageColor] = useState('#0000cc');
+    const [baseColor, setBaseColor] = useState('#999999');
     const panels = [
         {
             id: 'body',
@@ -525,80 +603,107 @@ const App = () => {
             id: 'wheels',
             name: 'Wheels'
         },
+        {
+            id: 'pizzazz',
+            name: 'Pizzazz'
+        }
     ];
+
+    // useEffect (() => {
+    //     return new THREE.Color(stageColor);
+    // }, [stageColor]);
     return (
         <>
-            { status === 'active' && body &&                  
-                <div className="details_wrapper">     
-                    <div className="details_content">
-                        { activePanel === 0 &&
-                            <div className="panel">
-                                <h2>Body Type</h2>         
-                                <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setBody(bodies[index])} }>
-                                    { bodies.map((body, index) =>             
-                                            (
-                                                <div className='details'>
-                                                    <h3>{ body.name }</h3>
-                                                    
-                                                    <div key={ index } className='details_body'>                                                    
-                                                        <ul>
-                                                            { body.speed && <li><span className='label'>Speed:</span> { body.speed }</li> }
-                                                            { body.agility && <li><span className='label'>Agility:</span> { body.agility }</li> }                            
-                                                            { body.specialMove && <li className='small'><span className='label display-block'>Special Move:</span> { body.specialMove }</li> }
-                                                            { body.features && <li className='small'><span className='label display-block'>Features:</span>
-                                                                <ul>
-                                                                    { body.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                                                                                        
-                                                                </ul>
-                                                            </li> }
-                                                        </ul>
-                                                    </div>
+                        
+            <div className={`details_wrapper ${ status === 'active' && body ? 'is-active' : ''}`}>     
+                <div className="details_content">
+                    { activePanel === 0 &&
+                        <div className="panel">
+                            <h2>Body Type</h2>         
+                            <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setBody(bodies[index])} }>
+                                { bodies.map((body, index) =>             
+                                        (
+                                            <div className='details' key={ index }>
+                                                <h3>{ body.name }</h3>
+                                                
+                                                <div key={ index } className='details_body'>                                                    
+                                                    <ul>
+                                                        { body.speed && <li><span className='label'>Speed:</span> { body.speed }</li> }
+                                                        { body.agility && <li><span className='label'>Agility:</span> { body.agility }</li> }                            
+                                                        { body.specialMove && <li className='small'><span className='label display-block'>Special Move:</span> { body.specialMove }</li> }
+                                                        { body.features && <li className='small'><span className='label display-block'>Features:</span>
+                                                            <ul>
+                                                                { body.features.map((feature, featureIndex) => <li key={featureIndex}>{ feature }</li>) }                                                                                                        
+                                                            </ul>
+                                                        </li> }
+                                                    </ul>
                                                 </div>
-                                            )
-                                    ) }
-                                </Carousel>
-                                <h2>Body Color</h2>                    
-                                <input type="color" defaultValue={ bodyColor } onChange={(e) => {playSpray(); setBodyColor(e.target.value)}}/>
-                            </div>
-                        }
-                            { activePanel === 1 &&
-                            <div className="panel">
-                                <h2>Wheels</h2>
-                                <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setWheel(wheels[index])} }>
-                                    { wheels.map((wheel, index) =>             
-                                            (
+                                            </div>
+                                        )
+                                ) }
+                            </Carousel>
+                            <h2>Body Color</h2>                    
+                            <input type="color" defaultValue={ bodyColor } onChange={(e) => {playSpray(); setBodyColor(e.target.value)}}/>
+                        </div>
+                    }
+                    { activePanel === 1 &&
+                        <div className="panel">
+                            <h2>Wheels</h2>
+                            <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setWheel(wheels[index])} }>
+                                { wheels.map((wheel, index) =>             
+                                        (
 
-                                                <div key={ index } className='details'>
-                                                    <h3>{ wheel.name }</h3>
-                                                    <div className="details_body">
-                                                        <ul>                                                                  
-                                                            { wheel.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                        
-                                                        </ul>
-                                                    </div>
+                                            <div key={ index } className='details'>
+                                                <h3>{ wheel.name }</h3>
+                                                <div className="details_body">
+                                                    <ul>                                                                  
+                                                        { wheel.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                        
+                                                    </ul>
                                                 </div>
-                                            )
-                                    ) }
-                                </Carousel>
-                            </div>
-                        }
-                    </div>
-                    <div className="details_nav">
-                        { panels.map((panel, index) =>
-                            <button key={ index } className={ `panel_nav ${activePanel === index ? 'is-active': ''}`} onClick={ () => setActivePanel(index)}>
-                                { panel.name }
-                            </button>
-                        ) }
+                                            </div>
+                                        )
+                                ) }
+                            </Carousel>
+                        </div>
+                    }
+                    { activePanel === 2 &&
+                        <div className="panel">
+                            <h2>Pizzazz</h2>                            
+                            <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setPizzazz(pizzazzes[index])} }>
+                                { pizzazzes.map((pizzazz, index) =>             
+                                        (
+
+                                            <div key={ index } className='details'>
+                                                <h3>{ pizzazz.name }</h3>
+                                              
+                                            </div>
+                                        )
+                                ) }
+                            </Carousel>
+                            <h2>Stage Color</h2>                    
+                            <input type="color" defaultValue={ stageColor } onChange={(e) => {playSpray(); setStageColor(e.target.value)}}/>
+                            <h2>Base Color</h2>                    
+                            <input type="color" defaultValue={ baseColor } onChange={(e) => {playSpray(); setBaseColor(e.target.value)}}/>
+                        </div>
+                    }
+
+                </div>
+                <div className="details_nav">
+                    { panels.map((panel, index) =>
+                        <button key={ index } className={ `panel_nav ${activePanel === index ? 'is-active': ''}`} onClick={ () => setActivePanel(index)}>
+                            { panel.name }
+                        </button>
+                    ) }
 
 
-                    </div>                    
-                    <button className="start-button" onClick={() =>{ setTimeout(() => playHydraulic(),500); setStatus('staging')}}>Ready for Photos!</button>
-                </div>                
-                
-            }
+                </div>                    
+                <button style={{ marginTop: '20px' }} className="start-button" onClick={() =>{  setTimeout(() => playHydraulic(),500); setStatus('staging')}}>Ready for Photos! 🔥</button>
+            </div>                
             
-            <Canvas        
-                onCreated={({ gl }) => {
-                gl.setClearColor(new THREE.Color(0x0000cc));
-            }}>
+        
+            
+            <Canvas >
+                  <color attach="background" args={[stageColor]} />
             <OrbitControls makeDefault                   
                 enablePan={false }
                 enableZoom={false }
@@ -612,7 +717,7 @@ const App = () => {
             {/* <XR> */}
                 {/* <Hands/>
                 <Controllers/> */}
-                <Scene playHydraulic={ playHydraulic } body={ body } bodyColor={ bodyColor } wheel={ wheel } status={ status } setStatus={ setStatus }  carPosition={ carPosition }/>
+                <Scene playHydraulic={ playHydraulic } body={ body } bodyColor={ bodyColor } wheel={ wheel } pizzazz={ pizzazz} status={ status } setStatus={ setStatus }  carPosition={ carPosition } stageColor={stageColor} baseColor={ baseColor }/>
 
                 {/* <EffectComposer>
 

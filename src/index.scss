@@ -71,8 +71,10 @@ html {
         top: 60%;
         left: 50%;
         z-index: 1;
-        transform: translate(0, -50%);
+		transition: 1s transform ease-out;
+        transform: translate(0, 200%);
         width: 300px;
+
         h2 {
             color: $color_2;
             font-family: $font-family_1;
@@ -88,6 +90,9 @@ html {
 			box-sizing: border-box;
 			//padding-bottom:  var(--details-border);
         }
+		&.is-active{
+			transform: translate(0, -50%);
+		}
     }
 	font-family: $font-family_1;
 	color: $color_3;
