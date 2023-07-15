@@ -577,6 +577,7 @@ const defaultPosition = {
     );
   }
 
+let glInstance;
 
 const App = () => {
     const [ activePanel, setActivePanel ] = useState(0);
@@ -609,6 +610,21 @@ const App = () => {
         }
     ];
 
+
+    // set timer for 5 minutes of inactivity
+    // what is 5 mintues in milliseconds?
+    const inactiveThreshold = 300000;
+
+    let timer = setTimeout(() => setStatus('inactive'), inactiveThreshold);
+
+    // on mouse move reset timer
+    document.addEventListener('mousemove', () => {
+        clearTimeout(timer);
+        //setStatus('active');
+        timer = setTimeout(() => setStatus('inactive'), inactiveThreshold);
+    });
+
+
     // useEffect (() => {
     //     return new THREE.Color(stageColor);
     // }, [stageColor]);
@@ -618,7 +634,15 @@ const App = () => {
             { status === 'staging' &&
                 <div className="staging">
                     {/* Take a picture  */}
-                    <button className="start-button" onClick={() =>{ }}>Take a Picture</button>
+                    <button className="start-button" onClick={() =>{ 
+
+                        // flash screen and display image on page
+                        const link = document.createElement('a')
+                        link.setAttribute('download', 'canvas.png')
+                        link.setAttribute('href', glInstance.domElement.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+                        link.click()
+
+                     }}>Take a Picture</button>
                     {/* Back to build */}
                     <button className="start-button" onClick={() =>{ setStatus('active')}}>Back to Build</button>
                 </div>
@@ -710,11 +734,15 @@ const App = () => {
             
         
             
-            <Canvas >
+            <Canvas  gl={{ preserveDrawingBuffer: true }} 
+                onCreated={({ gl }) => {
+                    glInstance = gl;
+                }}
+            >
                   <color attach="background" args={[stageColor]} />
             <OrbitControls makeDefault                   
                 enablePan={false }
-                enableZoom={false }
+                enableZoom={ status === 'staging' }
                 minPolarAngle={-Math.PI/8}
                 maxPolarAngle={Math.PI/2 + Math.PI/20}
                     
