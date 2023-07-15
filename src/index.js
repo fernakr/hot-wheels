@@ -7,6 +7,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a lo
 import { Carousel } from 'react-responsive-carousel';
 
 import './index.scss';
+import HotWheels from './assets/models/Hotwheels';
 
 import useSound from 'use-sound';
 import hydraulicSfx from './hydraulic.mp3';
@@ -127,7 +128,7 @@ const ModelViewer = ({ model, position, rotation, scale, clickHandler }) => {
     return <primitive castShadow onClick={clickHandler} object={gltf.scene} position={position} rotation={rotation} scale={scale} />
 }
 
-const Logo = ({ status }) => {
+const Logo = ({ status, logoColor, logoColor2 }) => {
     let fontLoader = new FontLoader();
     let textFont = fontLoader.parse(myFont);
 
@@ -171,9 +172,7 @@ const Logo = ({ status }) => {
 
     //console.log(position);
     return (<animated.group position={springLogo.position} rotation={springLogo.rotation}>
-        <ModelViewer
-            model="./assets/models/hotwheels.gltf"            
-        />        
+        <HotWheels logoColor={ logoColor } logoColor2={ logoColor2 }/>
         
         {textFont &&
             <animated.group position={ springText.position }>
@@ -315,8 +314,8 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, ba
         )
     };
 
-    // const changeBody = (currBody) => {
-    //     let index = bodies.findIndex(body => body.id === currBody.id);
+    // const changeBody = (defaultBody) => {
+    //     let index = bodies.findIndex(body => body.id === defaultBody.id);
     //     index++;
     //     if (index > bodies.length - 1) index = 0;
     //     return bodies[index];
@@ -398,7 +397,7 @@ const Track = () => {
   }
   
 
-const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor, wheel, stageColor, baseColor }) => {
+const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor, wheel, stageColor, baseColor, logoColor, logoColor2 }) => {
 
     
     useFrame(() => {
@@ -417,7 +416,7 @@ const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor,
             <pointLight position={[15, 0, 10]} intensity={1} castShadow />
             <spotLight position={[10, 0, -15]} intensity={status === 'inactive' ? 0 : 0.5} castShadow />
             <ambientLight intensity={status === 'inactive' ? 0.3 : 0} castShadow />            
-            <Logo status={ status } />            
+            <Logo status={ status } logoColor={ logoColor } logoColor2={ logoColor2 } />            
             <Suspense fallback={<Loader />}>
                 <group 
                     position={[-12, -7, -7]}
@@ -585,19 +584,34 @@ let glInstance;
 const App = () => {
     const [ activePanel, setActivePanel ] = useState(0);
     const [ status, setStatus ] = useState('inactive');
-    const currBody = bodies[0];
-    const [body, setBody] = useState(currBody);    
-    const [bodyColor, setBodyColor] = useState('#ffffff');
-    const currWheel = wheels[0];
-    const [wheel, setWheel] = useState(currWheel);
-    const currPizzazz = pizzazzes[0];
-    const [pizzazz, setPizzazz] = useState(currPizzazz);
+
+    const defaultBody = bodies[0];
+    const [body, setBody] = useState(defaultBody);    
+    const defaultBodyColor  = '#ffffff';
+    const [bodyColor, setBodyColor] = useState(defaultBodyColor);
+    
+    const defaultWheel = wheels[0];
+    const [wheel, setWheel] = useState(defaultWheel);
+    
+    const defaultPizzazz = pizzazzes[0];
+    const [pizzazz, setPizzazz] = useState(defaultPizzazz);
+    
     const [playHydraulic] = useSound(hydraulicSfx, { volume: 0.5 })
     const [playHatch] = useSound(hatchSfx, { volume: 0.5 })
     const [playSpray] = useSound(spraySfx, { volume: 0.25 })
+    
     const carPosition = [2, -12, -7];
-    const [stageColor, setStageColor] = useState('#0000cc');
-    const [baseColor, setBaseColor] = useState('#999999');
+    
+    const defaultStageColor = '#0000cc';
+    const [stageColor, setStageColor] = useState(defaultStageColor);
+    const defaultBaseColor = '#999999';
+    const [baseColor, setBaseColor] = useState(defaultBaseColor);
+
+    const defaultLogoColor = '#ff0000';
+    const [logoColor, setLogoColor] = useState(defaultLogoColor);
+    const defaultLogoColor2 = '#ffff00';
+    const [logoColor2, setLogoColor2] = useState(defaultLogoColor2);
+
     const panels = [
         {
             id: 'body',
@@ -608,8 +622,8 @@ const App = () => {
             name: 'Wheels'
         },
         {
-            id: 'pizzazz',
-            name: 'Pizzazz'
+            id: 'environment',
+            name: 'Environment'
         }
     ];
 
@@ -622,21 +636,39 @@ const App = () => {
 
     // on mouse move reset timer
     document.addEventListener('mousemove', () => {
-        clearTimeout(timer);
-        //setStatus('active');
-        timer = setTimeout(() => setStatus('inactive'), inactiveThreshold);
+        clearTimeout(timer);        
+        timer = setTimeout(() => {
+            setStatus('inactive');
+            reset();
+
+        }, inactiveThreshold);
     });
+
+    const reset = () => {
+        setBody(defaultBody);
+        setWheel(defaultWheel);
+        setPizzazz(defaultPizzazz);
+        setBodyColor(defaultBodyColor);
+        setStageColor(defaultStageColor);
+        setBaseColor(defaultBaseColor);
+        setLogoColor(defaultLogoColor);
+        setLogoColor2(defaultLogoColor2);
+        
+    }
 
     const randomize = () => {
         const randomBody = bodies[Math.floor(Math.random() * bodies.length)];
         const randomWheel = wheels[Math.floor(Math.random() * wheels.length)];
         const randomPizzazz = pizzazzes[Math.floor(Math.random() * pizzazzes.length)];
+        
         setBody(randomBody);
         setWheel(randomWheel);
         setPizzazz(randomPizzazz);
         setBodyColor('#' + Math.floor(Math.random()*16777215).toString(16));
         setStageColor('#' + Math.floor(Math.random()*16777215).toString(16));
         setBaseColor('#' + Math.floor(Math.random()*16777215).toString(16));
+        setLogoColor('#' + Math.floor(Math.random()*16777215).toString(16));
+        setLogoColor2('#' + Math.floor(Math.random()*16777215).toString(16));
     }
 
 
@@ -704,7 +736,7 @@ const App = () => {
                     }
                     { activePanel === 1 &&
                         <div className="panel">
-                            <h2>Wheels</h2>
+                            <h2>Wheel Type</h2>
                             <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setWheel(wheels[index])} }>
                                 { wheels.map((wheel, index) =>             
                                         (
@@ -740,6 +772,10 @@ const App = () => {
                             <input type="color" defaultValue={ stageColor } onChange={(e) => {playSpray(); setStageColor(e.target.value)}}/>
                             <h2>Base Color</h2>                    
                             <input type="color" defaultValue={ baseColor } onChange={(e) => {playSpray(); setBaseColor(e.target.value)}}/>
+                            <h2>Logo Flame Color</h2>                                                
+                            <input type="color" defaultValue={ logoColor } onChange={(e) => {playSpray(); setLogoColor(e.target.value)}}/>
+                            <h2>Logo Text Color</h2>                    
+                            <input type="color" defaultValue={ logoColor2 } onChange={(e) => {playSpray(); setLogoColor2(e.target.value)}}/>
                         </div>
                     }
 
@@ -772,7 +808,7 @@ const App = () => {
             {/* <XR> */}
                 {/* <Hands/>
                 <Controllers/> */}
-                <Scene playHydraulic={ playHydraulic } body={ body } bodyColor={ bodyColor } wheel={ wheel } pizzazz={ pizzazz} status={ status } setStatus={ setStatus }  carPosition={ carPosition } stageColor={stageColor} baseColor={ baseColor }/>
+                <Scene playHydraulic={ playHydraulic } logoColor={ logoColor } logoColor2={ logoColor2} body={ body } bodyColor={ bodyColor } wheel={ wheel } pizzazz={ pizzazz} status={ status } setStatus={ setStatus }  carPosition={ carPosition } stageColor={stageColor} baseColor={ baseColor }/>
 
                 {/* <EffectComposer>
 
