@@ -8,7 +8,8 @@ import { Carousel } from 'react-responsive-carousel';
 
 import './index.scss';
 import HotWheels from './assets/models/Hotwheels';
-import Wheel from './assets/models/wheels/default/Wheel';
+import WheelDefault from './assets/models/wheels/default/Wheel';
+import WheelOrange from './assets/models/wheels/orange/Wheel';
 
 import useSound from 'use-sound';
 import hydraulicSfx from './hydraulic.mp3';
@@ -62,7 +63,7 @@ const wheels = [
     {
         id: 'default',
         name: 'Just Regular Ol\' Wheels',
-        model: Wheel,
+        model: WheelDefault,
         frame: true,
         features: [
             'Classic'
@@ -71,7 +72,7 @@ const wheels = [
     {
         id: 'oranges',
         name: 'Oranges',
-        front: true,
+        model: WheelOrange,
         frame: true,
         features: [
             'Citrusy'
@@ -314,13 +315,35 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, ba
             return wheels.map((wheelOutput, i) => (<group key={ i } visible={ wheel.id === wheelOutput.id }>     
                 { wheelOutput.model && 
                     axels.map((axel, i) => (
-                        sides.map((side, i) => (
+                        sides.map((side, i) => {
+                        let position = [0,0,0];
+                        let rotation = [0,0,0];
+                        let scale = [1,1,1];
+                        const frontOffset = 3;
+                        const leftOffset = 0;
+                        
+                        if (side === 'left') {
+                            position = [-1 * leftOffset, 0, -2.5];
+                            rotation = [0, Math.PI, 0];    
+                        }
+                        if (axel === 'front') {
+                            position = [0, 0, frontOffset];
+                            if (side === 'left') {
+                            position[2] = frontOffset - 2;
+                            }
+                            scale = [0.6, 0.6, 0.6];
+                        }
+                        return (
                             <wheelOutput.model 
                                 color={ wheelColor}
                                 key={ i } 
+                                position={ position }
+                                rotation={ rotation }
+                                scale={ scale }
                                 side={ side } 
                                 axel={ axel }></wheelOutput.model>
-                        ))
+                            )
+                        })
                 ))}                                
                 { !wheelOutput.model && 
                     <ModelViewer
