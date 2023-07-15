@@ -8,6 +8,7 @@ import { Carousel } from 'react-responsive-carousel';
 
 import './index.scss';
 import HotWheels from './assets/models/Hotwheels';
+import Wheel from './assets/models/Wheel';
 
 import useSound from 'use-sound';
 import hydraulicSfx from './hydraulic.mp3';
@@ -61,7 +62,7 @@ const wheels = [
     {
         id: 'default',
         name: 'Just Regular Ol\' Wheels',
-        front: true,
+        model: Wheel,
         frame: true,
         features: [
             'Classic'
@@ -78,6 +79,7 @@ const wheels = [
     },
     {
         id: 'tentacles',
+        position: [0,0,-0.5],
         name: 'Tentacles',
         front: false,
         frame: false,
@@ -271,7 +273,7 @@ const Ground = ({ stageColor }) => {
     </>)
 }
 
-const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, baseColor }) => {
+const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, baseColor, wheelColor }) => {
 
 
 
@@ -291,7 +293,7 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, ba
         </>)
     };
     
-    const Car = ({ position, rotation, body, bodyColor, carPosition }) => {
+    const Car = ({ position, rotation, body, wheelColor, bodyColor, carPosition }) => {
         
         
         const Axel = ({ position, rotation = [Math.PI / 2, 0, 0], size = 4 }) => {
@@ -306,20 +308,33 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, ba
         }
 
 
-        const Wheels = ({ wheel }) => (
-            wheels.map((wheelOutput, i) => (<group key={ i } visible={ wheel.id === wheelOutput.id }>     
-                <ModelViewer                    
-
-                    position={[0, 0, 0]}
-                    model={`./assets/models/wheels/${wheelOutput.id}/wheels.gltf`}
-                />
+        const Wheels = ({ wheel, wheelColor }) => {
+            const sides = ['left', 'right'];
+            const axels = ['back', 'front'];       
+            return wheels.map((wheelOutput, i) => (<group key={ i } visible={ wheel.id === wheelOutput.id }>     
+                { wheelOutput.model && 
+                    axels.map((axel, i) => (
+                        sides.map((side, i) => (
+                            <wheelOutput.model 
+                                color={ wheelColor}
+                                key={ i } 
+                                side={ side } 
+                                axel={ axel }></wheelOutput.model>
+                        ))
+                ))}                                
+                { !wheelOutput.model && 
+                    <ModelViewer
+                        position={wheelOutput.position ? wheelOutput.position : [0, 0, 1]} scale={[0.8, 0.8, 0.8]}
+                        model={`./assets/models/wheels/${wheelOutput.id}/wheels.gltf`}
+                    />                    
+                }
                 { wheelOutput.front && <ModelViewer
                         position={[0, 0, 1]} scale={[0.8, 0.8, 0.8]}
                         model={`./assets/models/wheels/${wheelOutput.id}/wheels-front.gltf`}
                     />
                 }
             </group>))
-        );
+        };
 
 
         const Spoiler = () => {
@@ -354,7 +369,9 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, ba
                 
                 <Spoiler/>
                 <Suspense>
-                    <Wheels wheel={wheel} />
+                    <Wheels 
+                        wheelColor={ wheelColor }
+                        wheel={wheel} />
                     { wheel.frame && <Frame />}               
                 </Suspense>
                 <Suspense>
@@ -400,7 +417,7 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, ba
     })
 
     return (        
-        <Car status={ status } body={body} bodyColor={ bodyColor} position={position} rotation={ rotation } />
+        <Car wheelColor={ wheelColor } status={ status } body={body} bodyColor={ bodyColor} position={position} rotation={ rotation } />
     )
 }
 
@@ -452,7 +469,7 @@ const Track = () => {
   }
   
 
-const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor, wheel, stageColor, baseColor, logoColor, logoColor2 }) => {
+const Scene = ({ wheelColor, playHydraulic, status, setStatus, carPosition, body, bodyColor, wheel, stageColor, baseColor, logoColor, logoColor2 }) => {
 
     
     useFrame(() => {
@@ -479,7 +496,7 @@ const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor,
                         <button className="button" onClick={() =>{ setTimeout(() => playHydraulic(),500); setStatus('active')}}>Build a Car 🔧</button>
                     </Html>
                 }                
-                <Configurator baseColor={ baseColor} wheel={ wheel } body={ body } bodyColor={ bodyColor } status={ status } carPosition={ carPosition} />            
+                <Configurator wheelColor={ wheelColor } baseColor={ baseColor} wheel={ wheel } body={ body } bodyColor={ bodyColor } status={ status } carPosition={ carPosition} />            
             
             </Suspense>
             <pointLight position={[-10, 10, -10]} radius={10} intensity={0.5} castShadow />
@@ -664,8 +681,11 @@ const App = () => {
     const defaultBodyColor  = '#ffffff';
     const [bodyColor, setBodyColor] = useState(defaultBodyColor);
     
+    
     const defaultWheel = wheels[0];
     const [wheel, setWheel] = useState(defaultWheel);
+    const defaultWheelColor = '#222222';
+    const [wheelColor, setWheelColor] = useState(defaultWheelColor);
     
     const defaultPizzazz = pizzazzes[0];
     const [pizzazz, setPizzazz] = useState(defaultPizzazz);
@@ -723,6 +743,7 @@ const App = () => {
     const reset = () => {
         setBody(defaultBody);
         setWheel(defaultWheel);
+        setWheelColor(defaultWheelColor);
         setPizzazz(defaultPizzazz);
         setBodyColor(defaultBodyColor);
         setStageColor(defaultStageColor);
@@ -740,12 +761,14 @@ const App = () => {
         
         setBody(randomBody);
         setWheel(randomWheel);
+        
         setPizzazz(randomPizzazz);
         setBodyColor('#' + Math.floor(Math.random()*16777215).toString(16));
         setStageColor('#' + Math.floor(Math.random()*16777215).toString(16));
         setBaseColor('#' + Math.floor(Math.random()*16777215).toString(16));
         setLogoColor('#' + Math.floor(Math.random()*16777215).toString(16));
         setLogoColor2('#' + Math.floor(Math.random()*16777215).toString(16));
+        setWheelColor('#' + Math.floor(Math.random()*16777215).toString(16));
     }
 
     const sendPhoto = () => {        
@@ -892,6 +915,11 @@ const App = () => {
                                         )
                                 ) }
                             </Carousel>
+                            { wheel.id === 'default' && 
+                            <>
+                                <h2>Wheel Color</h2>                    
+                                <input type="color" value={ wheelColor } onChange={(e) => {playSpray(); setWheelColor(e.target.value)}}/>
+                            </>}
                         </div>
                     }
                     { activePanel === 2 &&
@@ -948,7 +976,7 @@ const App = () => {
             {/* <XR> */}
                 {/* <Hands/>
                 <Controllers/> */}
-                <Scene playHydraulic={ playHydraulic } logoColor={ logoColor } logoColor2={ logoColor2} body={ body } bodyColor={ bodyColor } wheel={ wheel } pizzazz={ pizzazz} status={ status } setStatus={ setStatus }  carPosition={ carPosition } stageColor={stageColor} baseColor={ baseColor }/>
+                <Scene wheelColor={ wheelColor } playHydraulic={ playHydraulic } logoColor={ logoColor } logoColor2={ logoColor2} body={ body } bodyColor={ bodyColor } wheel={ wheel } pizzazz={ pizzazz} status={ status } setStatus={ setStatus }  carPosition={ carPosition } stageColor={stageColor} baseColor={ baseColor }/>
 
                 {/* <EffectComposer>
 
