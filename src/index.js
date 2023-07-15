@@ -861,7 +861,10 @@ const App = () => {
     return (
         <>
 
-            
+            { status !== 'inactive' && <button className='start-over button' onClick={() => {
+                setStatus('inactive');
+                reset();
+            }}>Start over 🔁</button>}
             { shareImage && 
                 <div className="image_wrapper">                    
                     <div className='image'>
