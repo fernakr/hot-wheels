@@ -245,8 +245,14 @@ const Logo = ({ status, logoColor, logoColor2, stageColor }) => {
         
         {textFont &&
             <animated.group position={ springText.position }>
-                { textOutput.map((text, i) => (           
-                    <group key={ i } position={text.position}>
+                { textOutput.map((text, i) => {         
+
+                    let color = text.color ? text.color : 'white';
+                    if (!darkMode) {
+                        // invert color
+                       color = 'black';
+                    }
+                    return <group key={ i } position={text.position}>
                         <mesh >
                             <textGeometry attach="geometry" args={                            
                                 [text.text,{
@@ -255,7 +261,7 @@ const Logo = ({ status, logoColor, logoColor2, stageColor }) => {
                                     height: .01
                                 }]
                             } />
-                            <meshStandardMaterial attach="material" color={ !darkMode ? 'navy' : (text.color ? text.color : 'white') }  />
+                            <meshStandardMaterial attach="material" color={ color }  />
                         </mesh>                       
                         <mesh position={[0.025,-0.05,-0.05]}>
                             <textGeometry attach="geometry"  args={                            
@@ -265,10 +271,12 @@ const Logo = ({ status, logoColor, logoColor2, stageColor }) => {
                                     height: .01
                                 }]} 
                             />
-                            <meshStandardMaterial attach="material" color={!darkMode ? 'orange' : 'navy'} />
+                            <meshPhysicalMaterial 
+                            transmission={0.9}
+                            attach="material" color={!darkMode ? '#ccc' : 'navy'} />
                         </mesh>
                     </group>
-                ))}
+})}
             </animated.group>
         }
         
