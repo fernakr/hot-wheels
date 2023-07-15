@@ -8,7 +8,7 @@ import { Carousel } from 'react-responsive-carousel';
 
 import './index.scss';
 import HotWheels from './assets/models/Hotwheels';
-import Wheel from './assets/models/Wheel';
+import Wheel from './assets/models/wheels/default/Wheel';
 
 import useSound from 'use-sound';
 import hydraulicSfx from './hydraulic.mp3';
