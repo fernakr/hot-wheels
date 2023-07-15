@@ -741,8 +741,10 @@ const App = () => {
             >
                   <color attach="background" args={[stageColor]} />
             <OrbitControls makeDefault                   
-                enablePan={false }
-                enableZoom={ status === 'staging' }
+                enablePan={false } 
+                enableZoom={status === 'staging'}               
+                minDistance={ 3 }
+                maxDistance={ 20 }
                 minPolarAngle={-Math.PI/8}
                 maxPolarAngle={Math.PI/2 + Math.PI/20}
                     
