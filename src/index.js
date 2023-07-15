@@ -154,9 +154,27 @@ const ModelViewer = ({ model, position, rotation, scale, clickHandler, visible =
     return <primitive visible={ visible } onClick={clickHandler} object={gltf.scene} position={position} rotation={rotation} scale={scale} />
 }
 
-const Logo = ({ status, logoColor, logoColor2 }) => {
+const checkColor = (c) => {
+     // check if stageColor is dark or light
+     var c = c.substring(1);      // strip #
+     var rgb = parseInt(c, 16);   // convert rrggbb to decimal
+     var r = (rgb >> 16) & 0xff;  // extract red
+     var g = (rgb >>  8) & 0xff;  // extract green
+     var b = (rgb >>  0) & 0xff;  // extract blue
+ 
+     var luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
+ 
+     return luma > 100
+}
+
+const Logo = ({ status, logoColor, logoColor2, stageColor }) => {
     let fontLoader = new FontLoader();
     let textFont = fontLoader.parse(myFont);
+
+    let darkMode = checkColor(stageColor);
+    // if (checkColor(stageColor)) {
+    //     darkMode = true;
+    // }
 
     const textOutput = [
         {
@@ -184,7 +202,7 @@ const Logo = ({ status, logoColor, logoColor2 }) => {
         
     
     const springText = useSpring({
-        position: status === 'inactive' ? [0,0,0] : [0,40,0],
+        position: status !== 'staging' ? [0,0,0] : [0,40,0],
         config: { duration: 250, tension: 30, friction: 20  }
     });
 
@@ -235,9 +253,9 @@ const Logo = ({ status, logoColor, logoColor2 }) => {
                                     height: .01
                                 }]
                             } />
-                            <meshStandardMaterial attach="material" color={ text.color ? text.color : 'white' }  />
-                        </mesh>
-                        <mesh position={[0.05,-0.05,-0.05]}>
+                            <meshStandardMaterial attach="material" color={ darkMode ? 'navy' : (text.color ? text.color : 'white') }  />
+                        </mesh>                       
+                        <mesh position={[0.025,-0.05,-0.05]}>
                             <textGeometry attach="geometry"  args={                            
                                 [text.text,{
                                     font: textFont,
@@ -245,7 +263,7 @@ const Logo = ({ status, logoColor, logoColor2 }) => {
                                     height: .01
                                 }]} 
                             />
-                            <meshStandardMaterial attach="material" color="navy" />
+                            <meshStandardMaterial attach="material" color={darkMode ? 'orange' : 'navy'} />
                         </mesh>
                     </group>
                 ))}
@@ -526,7 +544,7 @@ const Scene = ({ wheelColor, playHydraulic, status, setStatus, carPosition, body
             <pointLight position={[15, 0, 10]} intensity={1} castShadow />
             <spotLight position={[10, 0, -15]} intensity={status === 'inactive' ? 0 : 0.5} castShadow />
             <ambientLight intensity={status === 'inactive' ? 0.3 : 0} castShadow />            
-            <Logo status={ status } logoColor={ logoColor } logoColor2={ logoColor2 } />            
+            <Logo stageColor={ stageColor } status={ status } logoColor={ logoColor } logoColor2={ logoColor2 } />            
             
         </>
     );
