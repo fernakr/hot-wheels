@@ -185,8 +185,26 @@ const Logo = ({ status, logoColor, logoColor2 }) => {
         config: { duration: 250, tension: 30, friction: 20  }
     });
 
+    let logoPosition = [0, 3, -14];
+
+    // change position on mobile
+
+    if (window.innerWidth < 768) {
+        logoPosition[0] = logoPosition[0] + 6;
+        logoPosition[1] = logoPosition[1];
+    }
+    
+    let logoStagingPosition = [...logoPosition];
+
+    logoStagingPosition[0] = logoStagingPosition[0] - 3;
+    logoStagingPosition[1] = logoStagingPosition[1] - 4;
+    logoStagingPosition[2] = logoStagingPosition[2] + 6;
+
+
+
+
     const springLogo = useSpring({
-        position: status === 'staging' ? [-3, -1, -8] : [0, 3, -14],
+        position: status === 'staging' ? logoStagingPosition : logoPosition,
         rotation: status === 'staging' ? [0, Math.PI / 15, 0] : [Math.PI / 20, 0, 0],
         config: { duration: 1000, tension: 30, friction: 20  }
         
@@ -559,11 +577,22 @@ const defaultPosition = {
     targetPosition[1] = targetPosition[1] + 12;
     targetPosition[2] = targetPosition[2] -7;
 
+
     
-    const buildCameraPos = {
+    let buildCameraPos = {
         position: [5, 0, 2],
         target: targetPosition
     };
+
+    if (window.innerWidth < 768) {
+        targetPosition[0] = targetPosition[0] - 3;
+        targetPosition[1] = targetPosition[1] - 7;
+        targetPosition[2] = targetPosition[2] + 8;
+        buildCameraPos = {
+            position: [3, 0, 5],
+            target: targetPosition
+        }
+    }
     
     const inactiveCameraPos = {
         position: [-3, 0, 10],
