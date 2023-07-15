@@ -742,10 +742,20 @@ const App = () => {
                     <div className='image'>
                         <img src={ shareImage } />                        
                         <div className="image_options">
+                            
+                            <button className="button secondary" onClick={() => {
+                                const link = document.createElement('a');
+                                link.href = shareImage;
+                                link.download = 'hotwheels.png';
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                            }}>
+                                Download image ⬇️
+                            </button>
                             <button className="button" onClick={() =>{ 
                                 sendPhoto();
-                            }}>Send Picture to Email</button>
-                            
+                            }}>Send Picture to Email 📧</button>
                         </div>
                     </div>
                 </div>

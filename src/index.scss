@@ -7,6 +7,20 @@ $background-color_1: #0000cc;
 $border-right-color_1: yellow;
 $border-left-color_1: yellow;
 
+$mobile-breakpoint: 768px;
+
+@mixin mobile {
+    @media (max-width: $mobile-breakpoint) {
+        @content;
+    }
+}
+
+@mixin desktop {
+    @media (min-width: #{$mobile-breakpoint+ 1px}) {
+        @content;
+    }
+}
+
 @font-face {
 	font-family: 'AUdimat-Bold';
 	font-style: normal;
@@ -95,9 +109,29 @@ html {
     padding: 20px;
     text-align: center;
     img{
+        margin: auto;        
+        max-height: 60vh;
+        object-fit: cover;
         max-width: 100%;
         display: block;
-        margin-bottom: 15px;
+        height: auto;        
+        @include desktop{
+            max-height: 70vh;
+        }
+    }
+    &_options{
+        margin-top: 15px;
+        button{
+            @include mobile{
+                display: block;
+                margin: 10px auto;
+            }
+            @include desktop{
+                display: inline-block;
+                margin: 0 5px;
+            }            
+
+        }
     }
 }
 
@@ -120,12 +154,24 @@ html {
 .details {
     &_wrapper {
         position: fixed;
-        top: 50%;
-        left: 50%;
+        
         z-index: 1;
 		transition: 1s transform ease-out;
+        
+        width: 90%;
+        left: 5%;        
         transform: translate(0, 200%);
-        width: 320px;
+        max-height: calc(100vh - 30px);
+        overflow: scroll;
+        
+        @include mobile{
+            bottom: 30px;            
+        }
+        @include desktop{
+            top: 50%;        
+            left: 50%;
+            width: 320px;            
+        }
         
 
         h2 {
@@ -147,7 +193,10 @@ html {
 			//padding-bottom:  var(--details-border);
         }
 		&.is-active{
-			transform: translate(0, -50%);
+            transform: translate(0, 0);
+            @include desktop{
+			    transform: translate(0, -50%);
+            }
 		}
     }
 	font-family: $font-family_1;
@@ -159,7 +208,7 @@ html {
     &_content{
         background-color: rgba(0,0,0,0.4);        
         padding: 16px;
-        margin-bottom: 10px;
+        //margin-bottom: 10px;
     }
 	&_body{
 		background: #fff;
