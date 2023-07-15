@@ -614,7 +614,15 @@ const App = () => {
     // }, [stageColor]);
     return (
         <>
-                        
+
+            { status === 'staging' &&
+                <div className="staging">
+                    {/* Take a picture  */}
+                    <button className="start-button" onClick={() =>{ }}>Take a Picture</button>
+                    {/* Back to build */}
+                    <button className="start-button" onClick={() =>{ setStatus('active')}}>Back to Build</button>
+                </div>
+            }              
             <div className={`details_wrapper ${ status === 'active' && body ? 'is-active' : ''}`}>     
                 <div className="details_content">
                     { activePanel === 0 &&

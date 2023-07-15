@@ -65,6 +65,21 @@ html {
 	margin: 0;
 }
 
+.staging {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	width: 100%;
+	background: rgba(0,0,0,0.4);
+	padding: 10px;
+	display: flex;
+	justify-content: center;
+	button{
+		margin: 0 10px;
+	}
+}
+
 .details {
     &_wrapper {
         position: fixed;
