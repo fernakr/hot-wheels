@@ -14,8 +14,31 @@ import hydraulicSfx from './hydraulic.mp3';
 import hatchSfx from './hatch.m4a';
 import spraySfx from './spray.m4a';
 
+import {
+    EmailShareButton,
+    FacebookShareButton,
+    // HatenaShareButton,
+    // InstapaperShareButton,
+    // LineShareButton,
+    // LinkedinShareButton,
+    // LivejournalShareButton,
+    // MailruShareButton,
+    // OKShareButton,
+    // PinterestShareButton,
+    // PocketShareButton,
+    // RedditShareButton,
+    // TelegramShareButton,
+    // TumblrShareButton,
+    // TwitterShareButton,
+    // ViberShareButton,
+    // VKShareButton,
+    // WhatsappShareButton,
+    // WorkplaceShareButton
+  } from "react-share";
+  
 
-import { VRButton, ARButton, XR, Controllers, Hands, Interactive } from '@react-three/xr'
+
+//import { VRButton, ARButton, XR, Controllers, Hands, Interactive } from '@react-three/xr'
 //import { Canvas } from '@react-three/fiber'
 
 
@@ -427,7 +450,7 @@ const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor,
                 <Ground stageColor={ stageColor } />
                 { status === 'inactive' && 
                     <Html>
-                        <button className="start-button" onClick={() =>{ setTimeout(() => playHydraulic(),500); setStatus('active')}}>Build a Car 🔧</button>
+                        <button className="button" onClick={() =>{ setTimeout(() => playHydraulic(),500); setStatus('active')}}>Build a Car 🔧</button>
                     </Html>
                 }                
                 <Configurator baseColor={ baseColor} wheel={ wheel } body={ body } bodyColor={ bodyColor } status={ status } carPosition={ carPosition} />            
@@ -607,10 +630,12 @@ const App = () => {
     const defaultBaseColor = '#999999';
     const [baseColor, setBaseColor] = useState(defaultBaseColor);
 
-    const defaultLogoColor = '#ff0000';
+    const defaultLogoColor = '#e02200';
     const [logoColor, setLogoColor] = useState(defaultLogoColor);
-    const defaultLogoColor2 = '#ffff00';
+    const defaultLogoColor2 = '#ffd500';
     const [logoColor2, setLogoColor2] = useState(defaultLogoColor2);
+
+    const [shareImage, setShareImage] = useState(null);
 
     const panels = [
         {
@@ -671,30 +696,78 @@ const App = () => {
         setLogoColor2('#' + Math.floor(Math.random()*16777215).toString(16));
     }
 
+    const sendPhoto = () => {
+        const canvas = glInstance.domElement;
+        const image = canvas.toDataURL('image/png');
+        const email = prompt('Please enter your email address to receive your photo');
+        if (email) {
+            fetch('https://hotwheels-photobooth.herokuapp.com/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, image })
+            }).then((response) => {
+                if (response.status === 200) {
+                    alert('Your photo has been sent! Check your email.');
+                } else {
+                    alert('There was an error sending your photo. Please try again.');
+                }
+            });
+        }
+    }
+
+
+    const exitImage = () => {
+        setShareImage(null);
+    }
+
 
     // useEffect (() => {
     //     return new THREE.Color(stageColor);
     // }, [stageColor]);
+    // const bodyIndex = bodies.findIndex(b => b.id === body.id);
+    // const wheelIndex = wheels.findIndex(w => w.id === wheel.id);
+    //const pizzazzIndex = ;
     return (
         <>
 
+            
+            { shareImage && 
+                <div className="image_wrapper">                    
+                    <div className='image'>
+                        <img src={ shareImage } />                        
+                        <div className="image_options">
+                            <button className="button" onClick={() =>{ 
+                                sendPhoto();
+                            }}>Send Picture to Email</button>
+                            
+                        </div>
+                    </div>
+                </div>
+            }
             { status === 'staging' &&
+            
                 <div className="staging">
                     {/* Take a picture  */}
-                    <button className="start-button" onClick={() =>{ 
+                    { !shareImage && <button className="button" onClick={() =>{ 
+                        // output canvas and set image as open graph image for the page
+                        const canvas = glInstance.domElement;
+                        const image = canvas.toDataURL('image/png');
+                        setShareImage(image);
 
-                        // flash screen and display image on page
-                        const link = document.createElement('a')
-                        link.setAttribute('download', 'canvas.png')
-                        link.setAttribute('href', glInstance.domElement.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
-                        link.click()
-
-                     }}>Take a Picture 📷</button>
+                    }}>Take a Picture 📷</button>
+                    }
+                    { shareImage && <button className="button" onClick={() =>{ exitImage(); }}>Retake Picture 👈</button>}
+                    { /* Share on social media */}
+                
                     {/* Back to build */}
-                    <button className="start-button" onClick={() =>{ setStatus('active')}}>Back to Build 👈</button>
+                    <button className="button secondary" onClick={() =>{ setStatus('active'); setShareImage(null)}}>Back to Build 👈</button>
                 </div>
+            
             }              
             <div className={`details_wrapper ${ status === 'active' && body ? 'is-active' : ''}`}>     
+                <button style={{ marginBottom: '20px' }} className="button secondary" onClick={() =>{  randomize(); }}>Randomize 🔀</button>
                 <div className="details_nav">
                     { panels.map((panel, index) =>
                         <button key={ index } className={ `panel_nav ${activePanel === index ? 'is-active': ''}`} onClick={ () => setActivePanel(index)}>
@@ -707,8 +780,8 @@ const App = () => {
                 <div className="details_content">
                     { activePanel === 0 &&
                         <div className="panel">
-                            <h2>Body Type</h2>         
-                            <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setBody(bodies[index])} }>
+                            <h2>Body Type</h2>                                 
+                            <Carousel selectedItem={bodies.findIndex(b => b.id === body.id)} dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setBody(bodies[index])} }>
                                 { bodies.map((body, index) =>             
                                         (
                                             <div className='details' key={ index }>
@@ -731,13 +804,13 @@ const App = () => {
                                 ) }
                             </Carousel>
                             <h2>Body Color</h2>                    
-                            <input type="color" defaultValue={ bodyColor } onChange={(e) => {playSpray(); setBodyColor(e.target.value)}}/>
+                            <input type="color" value={ bodyColor } onChange={(e) => {playSpray(); setBodyColor(e.target.value)}}/>
                         </div>
                     }
                     { activePanel === 1 &&
                         <div className="panel">
                             <h2>Wheel Type</h2>
-                            <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setWheel(wheels[index])} }>
+                            <Carousel selectedItem={wheels.findIndex(w => w.id === wheel.id)} dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setWheel(wheels[index])} }>
                                 { wheels.map((wheel, index) =>             
                                         (
 
@@ -757,7 +830,7 @@ const App = () => {
                     { activePanel === 2 &&
                         <div className="panel">
                             <h2>Pizzazz</h2>                            
-                            <Carousel dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setPizzazz(pizzazzes[index])} }>
+                            <Carousel selectedItem={ pizzazzes.findIndex(p => p.id === pizzazz.id) } dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setPizzazz(pizzazzes[index])} }>
                                 { pizzazzes.map((pizzazz, index) =>             
                                         (
 
@@ -769,20 +842,20 @@ const App = () => {
                                 ) }
                             </Carousel>
                             <h2>Stage Color</h2>                    
-                            <input type="color" defaultValue={ stageColor } onChange={(e) => {playSpray(); setStageColor(e.target.value)}}/>
+                            <input type="color" value={ stageColor } onChange={(e) => {playSpray(); setStageColor(e.target.value)}}/>
                             <h2>Base Color</h2>                    
-                            <input type="color" defaultValue={ baseColor } onChange={(e) => {playSpray(); setBaseColor(e.target.value)}}/>
+                            <input type="color" value={ baseColor } onChange={(e) => {playSpray(); setBaseColor(e.target.value)}}/>
                             <h2>Logo Flame Color</h2>                                                
-                            <input type="color" defaultValue={ logoColor } onChange={(e) => {playSpray(); setLogoColor(e.target.value)}}/>
+                            <input type="color" value={ logoColor } onChange={(e) => {playSpray(); setLogoColor(e.target.value)}}/>
                             <h2>Logo Text Color</h2>                    
-                            <input type="color" defaultValue={ logoColor2 } onChange={(e) => {playSpray(); setLogoColor2(e.target.value)}}/>
+                            <input type="color" value={ logoColor2 } onChange={(e) => {playSpray(); setLogoColor2(e.target.value)}}/>
                         </div>
                     }
 
                 </div>
                                    
-                <button style={{ marginTop: '20px' }} className="start-button" onClick={() =>{  randomize(); }}>Randomize 🔀</button>
-                <button style={{ marginTop: '20px' }} className="start-button" onClick={() =>{  setTimeout(() => playHydraulic(),500); setStatus('staging')}}>Ready for Photos! 🔥</button>
+
+                <button style={{ marginTop: '20px' }} className="button" onClick={() =>{  setTimeout(() => playHydraulic(),500); setStatus('staging')}}>Ready for Photos! 🔥</button>
             </div>                
             
         
