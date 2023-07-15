@@ -678,6 +678,7 @@ const App = () => {
         setBaseColor(defaultBaseColor);
         setLogoColor(defaultLogoColor);
         setLogoColor2(defaultLogoColor2);
+        setShareImage(null);
         
     }
 
@@ -696,17 +697,20 @@ const App = () => {
         setLogoColor2('#' + Math.floor(Math.random()*16777215).toString(16));
     }
 
-    const sendPhoto = () => {
-        const canvas = glInstance.domElement;
-        const image = canvas.toDataURL('image/png');
+    const sendPhoto = () => {        
+//        const image = shareImage;
+        // shareImage to base64 encoding
+
+        //console.log(shareImage);
+        // const email = 'verticallychallenged@gmail.com';
         const email = prompt('Please enter your email address to receive your photo');
         if (email) {
-            fetch('https://hotwheels-photobooth.herokuapp.com/send', {
+            fetch(process.env.REACT_APP_API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ email, image })
+                body: JSON.stringify({ email, image: shareImage })
             }).then((response) => {
                 if (response.status === 200) {
                     alert('Your photo has been sent! Check your email.');
@@ -754,6 +758,8 @@ const App = () => {
                         // output canvas and set image as open graph image for the page
                         const canvas = glInstance.domElement;
                         const image = canvas.toDataURL('image/png');
+
+                        
                         setShareImage(image);
 
                     }}>Take a Picture 📷</button>
