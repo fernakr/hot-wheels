@@ -9,7 +9,7 @@ import * as THREE from 'three'
 
 export default function Model(props) {
   const group = useRef()
-  const { nodes, materials } = useGLTF('/assets/models/wheels/default/wheel.gltf')
+  const { nodes, materials } = useGLTF('./assets/models/wheels/default/wheel.gltf')
   //const { actions } = useAnimations(animations, group)
 
   const { color = 0x222222 } = props;
@@ -22,4 +22,4 @@ export default function Model(props) {
   )
 }
 
-useGLTF.preload('/assets/models/wheels/default/wheel.gltf')
+useGLTF.preload('./assets/models/wheels/default/wheel.gltf')
