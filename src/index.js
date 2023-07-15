@@ -187,12 +187,9 @@ const Logo = ({ status, logoColor, logoColor2 }) => {
 
     let logoPosition = [0, 3, -14];
 
+    let inactiveLogoPosition = [...logoPosition];
     // change position on mobile
 
-    if (window.innerWidth < 768) {
-        logoPosition[0] = logoPosition[0] + 6;
-        logoPosition[1] = logoPosition[1];
-    }
     
     let logoStagingPosition = [...logoPosition];
 
@@ -201,10 +198,18 @@ const Logo = ({ status, logoColor, logoColor2 }) => {
     logoStagingPosition[2] = logoStagingPosition[2] + 6;
 
 
+    if (window.innerWidth < 768) {
+        inactiveLogoPosition[1] = inactiveLogoPosition[1] + 3;
+        logoPosition[0] = logoPosition[0];
+        logoPosition[1] = logoPosition[1] - 6;
+        logoPosition[2] = logoPosition[2] - 3;
+        logoStagingPosition = [3, -2, -10];
+    }
+
 
 
     const springLogo = useSpring({
-        position: status === 'staging' ? logoStagingPosition : logoPosition,
+        position: status === 'inactive' ? inactiveLogoPosition : (status === 'staging' ? logoStagingPosition : logoPosition),
         rotation: status === 'staging' ? [0, Math.PI / 15, 0] : [Math.PI / 20, 0, 0],
         config: { duration: 1000, tension: 30, friction: 20  }
         
@@ -573,8 +578,8 @@ const defaultPosition = {
 
 
     let targetPosition = [...carPosition]
-    targetPosition[0] = targetPosition[0] + 3.5;
-    targetPosition[1] = targetPosition[1] + 12;
+    targetPosition[0] = targetPosition[0];
+    targetPosition[1] = targetPosition[1] + 14;
     targetPosition[2] = targetPosition[2] -7;
 
 
@@ -585,7 +590,7 @@ const defaultPosition = {
     };
 
     if (window.innerWidth < 768) {
-        targetPosition[0] = targetPosition[0] - 3;
+        targetPosition[0] = targetPosition[0] - 1;
         targetPosition[1] = targetPosition[1] - 7;
         targetPosition[2] = targetPosition[2] + 8;
         buildCameraPos = {
