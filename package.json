@@ -19,9 +19,9 @@
     "react-share": "^4.4.1",
     "sass": "^1.63.6",
     "three": "^0.154.0",
+    "tinycolor2": "^1.6.0",
     "use-sound": "^4.0.1"
   },
-  "devDependencies": {},
   "scripts": {
     "start": "HTTPS=true && react-scripts start ",
     "build": "react-scripts build",

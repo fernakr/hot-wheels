@@ -282,7 +282,11 @@ html {
                 background: $color_2;
                 color: $color_3;
             }
-        }        
+			body.is-light &{
+				color: navy;
+			}
+        }       
+
     }
 }
 .button {

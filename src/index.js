@@ -1,5 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import React, { useRef, useState, useMemo, useEffect, Suspense } from 'react'
+import tinycolor from 'tinycolor2';
 //import { Bloom, DepthOfField, EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { useSpring, a, animated, config } from '@react-spring/three'
@@ -155,16 +156,9 @@ const ModelViewer = ({ model, position, rotation, scale, clickHandler, visible =
 }
 
 const checkColor = (c) => {
-     // check if stageColor is dark or light
-     var c = c.substring(1);      // strip #
-     var rgb = parseInt(c, 16);   // convert rrggbb to decimal
-     var r = (rgb >> 16) & 0xff;  // extract red
-     var g = (rgb >>  8) & 0xff;  // extract green
-     var b = (rgb >>  0) & 0xff;  // extract blue
+     
  
-     var luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
- 
-     return luma > 100
+     return tinycolor(c).isDark();
 }
 
 const Logo = ({ status, logoColor, logoColor2, stageColor }) => {
@@ -172,6 +166,14 @@ const Logo = ({ status, logoColor, logoColor2, stageColor }) => {
     let textFont = fontLoader.parse(myFont);
 
     let darkMode = checkColor(stageColor);
+
+    // set document body class
+    
+    if (!darkMode) {
+        document.body.classList.add('is-light');
+    }else{
+        document.body.classList.remove('is-light');
+    }
     // if (checkColor(stageColor)) {
     //     darkMode = true;
     // }
@@ -253,7 +255,7 @@ const Logo = ({ status, logoColor, logoColor2, stageColor }) => {
                                     height: .01
                                 }]
                             } />
-                            <meshStandardMaterial attach="material" color={ darkMode ? 'navy' : (text.color ? text.color : 'white') }  />
+                            <meshStandardMaterial attach="material" color={ !darkMode ? 'navy' : (text.color ? text.color : 'white') }  />
                         </mesh>                       
                         <mesh position={[0.025,-0.05,-0.05]}>
                             <textGeometry attach="geometry"  args={                            
@@ -263,7 +265,7 @@ const Logo = ({ status, logoColor, logoColor2, stageColor }) => {
                                     height: .01
                                 }]} 
                             />
-                            <meshStandardMaterial attach="material" color={darkMode ? 'orange' : 'navy'} />
+                            <meshStandardMaterial attach="material" color={!darkMode ? 'orange' : 'navy'} />
                         </mesh>
                     </group>
                 ))}
