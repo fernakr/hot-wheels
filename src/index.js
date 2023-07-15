@@ -308,7 +308,7 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, ba
             <animated.group rotation={rotation} position={position} >
                 <Spoiler/>
                 <Wheels wheel={wheel} />
-                { wheel.frame !== false & <Frame />}               
+                { wheel.frame && <Frame />}               
                 <Body body={body}  />            
                 <Base />
             </animated.group>
@@ -428,7 +428,7 @@ const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor,
                 <Ground stageColor={ stageColor } />
                 { status === 'inactive' && 
                     <Html>
-                        <button className="start-button" onClick={() =>{ setTimeout(() => playHydraulic(),500); setStatus('active')}}>Build a Car</button>
+                        <button className="start-button" onClick={() =>{ setTimeout(() => playHydraulic(),500); setStatus('active')}}>Build a Car 🔧</button>
                     </Html>
                 }                
                 <Configurator baseColor={ baseColor} wheel={ wheel } body={ body } bodyColor={ bodyColor } status={ status } carPosition={ carPosition} />            
@@ -627,6 +627,18 @@ const App = () => {
         timer = setTimeout(() => setStatus('inactive'), inactiveThreshold);
     });
 
+    const randomize = () => {
+        const randomBody = bodies[Math.floor(Math.random() * bodies.length)];
+        const randomWheel = wheels[Math.floor(Math.random() * wheels.length)];
+        const randomPizzazz = pizzazzes[Math.floor(Math.random() * pizzazzes.length)];
+        setBody(randomBody);
+        setWheel(randomWheel);
+        setPizzazz(randomPizzazz);
+        setBodyColor('#' + Math.floor(Math.random()*16777215).toString(16));
+        setStageColor('#' + Math.floor(Math.random()*16777215).toString(16));
+        setBaseColor('#' + Math.floor(Math.random()*16777215).toString(16));
+    }
+
 
     // useEffect (() => {
     //     return new THREE.Color(stageColor);
@@ -645,12 +657,21 @@ const App = () => {
                         link.setAttribute('href', glInstance.domElement.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
                         link.click()
 
-                     }}>Take a Picture</button>
+                     }}>Take a Picture 📷</button>
                     {/* Back to build */}
-                    <button className="start-button" onClick={() =>{ setStatus('active')}}>Back to Build</button>
+                    <button className="start-button" onClick={() =>{ setStatus('active')}}>Back to Build 👈</button>
                 </div>
             }              
             <div className={`details_wrapper ${ status === 'active' && body ? 'is-active' : ''}`}>     
+                <div className="details_nav">
+                    { panels.map((panel, index) =>
+                        <button key={ index } className={ `panel_nav ${activePanel === index ? 'is-active': ''}`} onClick={ () => setActivePanel(index)}>
+                            { panel.name }
+                        </button>
+                    ) }
+
+
+                </div> 
                 <div className="details_content">
                     { activePanel === 0 &&
                         <div className="panel">
@@ -723,15 +744,8 @@ const App = () => {
                     }
 
                 </div>
-                <div className="details_nav">
-                    { panels.map((panel, index) =>
-                        <button key={ index } className={ `panel_nav ${activePanel === index ? 'is-active': ''}`} onClick={ () => setActivePanel(index)}>
-                            { panel.name }
-                        </button>
-                    ) }
-
-
-                </div>                    
+                                   
+                <button style={{ marginTop: '20px' }} className="start-button" onClick={() =>{  randomize(); }}>Randomize 🔀</button>
                 <button style={{ marginTop: '20px' }} className="start-button" onClick={() =>{  setTimeout(() => playHydraulic(),500); setStatus('staging')}}>Ready for Photos! 🔥</button>
             </div>                
             
