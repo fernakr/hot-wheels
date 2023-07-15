@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "./static/css/main.2cd13210.css",
+    "main.css": "./static/css/main.11f2cb10.css",
     "main.js": "./static/js/main.7f6d0ab3.js",
     "static/js/845.5be44460.chunk.js": "./static/js/845.5be44460.chunk.js",
     "static/media/loader.gif": "./static/media/loader.b19cf4dee32ebdd3a657.gif",
@@ -9,12 +9,12 @@
     "static/media/AUdimat-Bold.ttf": "./static/media/AUdimat-Bold.7b0e503b5a9753014b3d.ttf",
     "static/media/spray.m4a": "./static/media/spray.4bed552eba37edb8f650.m4a",
     "index.html": "./index.html",
-    "main.2cd13210.css.map": "./static/css/main.2cd13210.css.map",
+    "main.11f2cb10.css.map": "./static/css/main.11f2cb10.css.map",
     "main.7f6d0ab3.js.map": "./static/js/main.7f6d0ab3.js.map",
     "845.5be44460.chunk.js.map": "./static/js/845.5be44460.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.2cd13210.css",
+    "static/css/main.11f2cb10.css",
     "static/js/main.7f6d0ab3.js"
   ]
 }
