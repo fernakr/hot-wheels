@@ -14,27 +14,27 @@ import hydraulicSfx from './hydraulic.mp3';
 import hatchSfx from './hatch.m4a';
 import spraySfx from './spray.m4a';
 
-import {
-    EmailShareButton,
-    FacebookShareButton,
-    // HatenaShareButton,
-    // InstapaperShareButton,
-    // LineShareButton,
-    // LinkedinShareButton,
-    // LivejournalShareButton,
-    // MailruShareButton,
-    // OKShareButton,
-    // PinterestShareButton,
-    // PocketShareButton,
-    // RedditShareButton,
-    // TelegramShareButton,
-    // TumblrShareButton,
-    // TwitterShareButton,
-    // ViberShareButton,
-    // VKShareButton,
-    // WhatsappShareButton,
-    // WorkplaceShareButton
-  } from "react-share";
+// import {
+//     EmailShareButton,
+//     FacebookShareButton,
+//     // HatenaShareButton,
+//     // InstapaperShareButton,
+//     // LineShareButton,
+//     // LinkedinShareButton,
+//     // LivejournalShareButton,
+//     // MailruShareButton,
+//     // OKShareButton,
+//     // PinterestShareButton,
+//     // PocketShareButton,
+//     // RedditShareButton,
+//     // TelegramShareButton,
+//     // TumblrShareButton,
+//     // TwitterShareButton,
+//     // ViberShareButton,
+//     // VKShareButton,
+//     // WhatsappShareButton,
+//     // WorkplaceShareButton
+//   } from "react-share";
   
 
 
