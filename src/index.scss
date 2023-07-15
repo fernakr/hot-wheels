@@ -315,4 +315,11 @@ html {
 	z-index: 20;
 	background-color: yellow;
 	color: black;
+	@include mobile(){
+		top: auto;
+		bottom: 10px;
+		///left: 10px;
+		padding: 8px 12px;
+		//right: auto;
+	}
 }
