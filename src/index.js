@@ -53,7 +53,7 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 //import font from 'three/examples/fonts/helvetiker_regular.typeface.json'
 
 import { Canvas, useFrame, useLoader, extend, useThree } from '@react-three/fiber'
-import { OrbitControls, Html, useAnimations, useGLTF } from '@react-three/drei'
+import { OrbitControls, Html, useAnimations, useGLTF, Preload } from '@react-three/drei'
 import * as THREE from 'three';
 import myFont from './flash_rogers.typeface.json';
 
@@ -144,11 +144,11 @@ const pizzazzes = [
     }
 ]
 
-const ModelViewer = ({ model, position, rotation, scale, clickHandler }) => {
+const ModelViewer = ({ model, position, rotation, scale, clickHandler, visible = true }) => {
     const gltf = useLoader(GLTFLoader, model)
     // apply position to model
     //const animations = useAnimations(gltf.animations);
-    return <primitive castShadow onClick={clickHandler} object={gltf.scene} position={position} rotation={rotation} scale={scale} />
+    return <primitive visible={ visible } onClick={clickHandler} object={gltf.scene} position={position} rotation={rotation} scale={scale} />
 }
 
 const Logo = ({ status, logoColor, logoColor2 }) => {
@@ -170,7 +170,7 @@ const Logo = ({ status, logoColor, logoColor2 }) => {
         },
 
         {
-            text: 'Build-a-Car Portrait Studio',
+            text: 'Build-a-Car Photo Studio',
             size: 0.5,
             position: [-3, 1.5, -2],
             color: '#DC803D'
@@ -306,20 +306,20 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, ba
         }
 
 
-        const Wheels = ({ wheel }) => {
-            return (<>
+        const Wheels = ({ wheel }) => (
+            wheels.map((wheelOutput, i) => (<group key={ i } visible={ wheel.id === wheelOutput.id }>     
                 <ModelViewer                    
 
                     position={[0, 0, 0]}
-                    model={`./assets/models/wheels/${wheel.id}/wheels.gltf`}
+                    model={`./assets/models/wheels/${wheelOutput.id}/wheels.gltf`}
                 />
-                { wheel.front && <ModelViewer
+                { wheelOutput.front && <ModelViewer
                         position={[0, 0, 1]} scale={[0.8, 0.8, 0.8]}
-                        model={`./assets/models/wheels/${wheel.id}/wheels-front.gltf`}
+                        model={`./assets/models/wheels/${wheelOutput.id}/wheels-front.gltf`}
                     />
                 }
-            </>)
-        };
+            </group>))
+        );
 
 
         const Spoiler = () => {
@@ -351,11 +351,17 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, ba
         }
         return (
             <animated.group rotation={rotation} position={position} >
+                
                 <Spoiler/>
-                <Wheels wheel={wheel} />
-                { wheel.frame && <Frame />}               
-                <Body body={body}  />            
+                <Suspense>
+                    <Wheels wheel={wheel} />
+                    { wheel.frame && <Frame />}               
+                </Suspense>
+                <Suspense>
+                    <Body body={body}  />            
+                </Suspense>
                 <Base />
+
             </animated.group>
         )
     };
@@ -370,16 +376,19 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, ba
     // on click change body
 
 
-    const Body = ({ position = [0,0,0], body, rotation, scale }) => {
-        return (
-            <ModelViewer                                
-                model={`./assets/models/body/${body.id}.gltf`}
-                position={position}
-                rotation={rotation}
-                scale={scale}
-            />
-        )
-    };
+    const Body = ({ position = [0,0,0], body, rotation, scale }) => (
+        bodies.map((bodyOutput, i) => (
+            <group visible={ bodyOutput.id === body.id }>
+                <ModelViewer                        
+                    model={`./assets/models/body/${bodyOutput.id}.gltf`}
+                    position={position}
+                    rotation={rotation}
+                    scale={scale}
+                />
+            </group>
+        ))
+
+    );
 
     const startCarPosition = [...carPosition ];
     startCarPosition[1] = -4;
@@ -397,32 +406,32 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, ba
 
 const BodyPreload = () => {    
     return bodies.map((body, i) => {   
-        
-        return (
+        useGLTF.preload(`./assets/models/body/${body.id}.gltf`)
+        // return (
                     
-            <ModelViewer    
-                key={ i }        
-                position={ [-100, -100, 0] }                
-                model={`./assets/models/body/${body.id}.gltf`}
-            />        
-        )})
+        //     <ModelViewer    
+        //         key={ i }        
+        //         visible={ false }
+        //         position={ [-100, -100, 0] }                
+        //         model={`./assets/models/body/${body.id}.gltf`}
+        //     />        
+        // )})
+    })
         
 }
 
 const WheelPreload = () => {    
-    return wheels.map((wheel, i) => {      
+    return wheels.map((wheel, i) => { 
+             
         let wheelTypes = [''];
         if (wheel.front) {
             wheelTypes = wheelTypes.concat('-front');
         }
 
-        return wheelTypes.map((wheelType, i) => (                    
-            <ModelViewer            
-                key={ i }
-                position={ [-100, -100, 0] }                
-                model={`./assets/models/wheels/${wheel.id}/wheels${wheelType}.gltf`}
-            />        
-        ))})
+        return wheelTypes.map((wheelType, i) => {
+            useGLTF.preload(`./assets/models/wheels/${wheel.id}/wheels${wheelType}.gltf`)            
+        })
+    })
         
 }
 
@@ -457,13 +466,7 @@ const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor,
             <Suspense fallback={<Loader />}>
                 <BodyPreload  />
                 <WheelPreload />
-            </Suspense>
-            <pointLight position={[-10, 10, -10]} radius={10} intensity={0.5} castShadow />
-            <pointLight position={[15, 0, 10]} intensity={1} castShadow />
-            <spotLight position={[10, 0, -15]} intensity={status === 'inactive' ? 0 : 0.5} castShadow />
-            <ambientLight intensity={status === 'inactive' ? 0.3 : 0} castShadow />            
-            <Logo status={ status } logoColor={ logoColor } logoColor2={ logoColor2 } />            
-            <Suspense fallback={<Loader />}>
+                
                 <group 
                     position={[-12, -7, -7]}
                     rotation={[0,Math.PI/3,0]}
@@ -477,7 +480,14 @@ const Scene = ({ playHydraulic, status, setStatus, carPosition, body, bodyColor,
                     </Html>
                 }                
                 <Configurator baseColor={ baseColor} wheel={ wheel } body={ body } bodyColor={ bodyColor } status={ status } carPosition={ carPosition} />            
+            
             </Suspense>
+            <pointLight position={[-10, 10, -10]} radius={10} intensity={0.5} castShadow />
+            <pointLight position={[15, 0, 10]} intensity={1} castShadow />
+            <spotLight position={[10, 0, -15]} intensity={status === 'inactive' ? 0 : 0.5} castShadow />
+            <ambientLight intensity={status === 'inactive' ? 0.3 : 0} castShadow />            
+            <Logo status={ status } logoColor={ logoColor } logoColor2={ logoColor2 } />            
+            
         </>
     );
 };
@@ -933,7 +943,7 @@ const App = () => {
                     
             />
             <EyeAnimation status={ status } carPosition={ carPosition }/>
-
+            
                 
             {/* <XR> */}
                 {/* <Hands/>
