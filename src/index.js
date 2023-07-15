@@ -38,6 +38,7 @@ const wheels = [
         id: 'default',
         name: 'Just Regular Ol\' Wheels',
         front: true,
+        frame: true,
         features: [
             'Classic'
         ]
@@ -46,18 +47,20 @@ const wheels = [
         id: 'oranges',
         name: 'Oranges',
         front: true,
+        frame: true,
         features: [
             'Citrusy'
         ]
     },
-    // {
-    //     id: 'tentacles',
-    //     name: 'Tentacles',
-    //     front: false,
-    //     features: [
-    //         'Citrusy'
-    //     ]
-    // }
+    {
+        id: 'tentacles',
+        name: 'Tentacles',
+        front: false,
+        frame: false,
+        features: [
+            'Grabby'
+        ]
+    }
 ]
 
 const bodies = [
@@ -305,7 +308,7 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, ba
             <animated.group rotation={rotation} position={position} >
                 <Spoiler/>
                 <Wheels wheel={wheel} />
-                <Frame />                
+                { wheel.frame !== false & <Frame />}               
                 <Body body={body}  />            
                 <Base />
             </animated.group>
@@ -338,7 +341,7 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, ba
 
     const { position, rotation } = useSpring(
             { 
-                    position: status !== 'inactive' ? startCarPosition : carPosition, rotation: status !== 'inactive' ? [0, Math.PI / 15, 0] : [0, - Math.PI / 9, 0], 
+                    position: status !== 'inactive' ? startCarPosition : carPosition, rotation: status !== 'inactive' ? [0, Math.PI / 20, 0] : [0, - Math.PI / 9, 0], 
                     config: { duration: 4000, tension: 300, friction: 20  }, // Set the duration to 1000 milliseconds (1 second)
     })
 
@@ -536,7 +539,7 @@ const defaultPosition = {
 
     
     const buildCameraPos = {
-        position: [3, 0, 2],
+        position: [5, 0, 2],
         target: targetPosition
     };
     
@@ -592,7 +595,7 @@ const App = () => {
     const [playHydraulic] = useSound(hydraulicSfx, { volume: 0.5 })
     const [playHatch] = useSound(hatchSfx, { volume: 0.5 })
     const [playSpray] = useSound(spraySfx, { volume: 0.25 })
-    const carPosition = [0, -12, -7];
+    const carPosition = [2, -12, -7];
     const [stageColor, setStageColor] = useState('#0000cc');
     const [baseColor, setBaseColor] = useState('#999999');
     const panels = [
