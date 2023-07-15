@@ -273,7 +273,7 @@ const Logo = ({ status, logoColor, logoColor2, stageColor }) => {
                             />
                             <meshPhysicalMaterial 
                             transmission={0.9}
-                            attach="material" color={!darkMode ? '#ccc' : 'navy'} />
+                            attach="material" color={!darkMode ? '#ddddcc' : 'navy'} />
                         </mesh>
                     </group>
 })}
