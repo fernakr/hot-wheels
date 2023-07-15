@@ -578,9 +578,16 @@ const defaultPosition = {
 
 
     let targetPosition = [...carPosition]
-    targetPosition[0] = targetPosition[0];
-    targetPosition[1] = targetPosition[1] + 14;
+
+    targetPosition[0] = targetPosition[0] + 3.5;
+    targetPosition[1] = targetPosition[1] + 12;
     targetPosition[2] = targetPosition[2] -7;
+
+    // targetPosition[0] = targetPosition[0];
+    // targetPosition[1] = targetPosition[1] + 14;
+    // targetPosition[2] = targetPosition[2] -7;
+
+
 
 
     
@@ -590,8 +597,8 @@ const defaultPosition = {
     };
 
     if (window.innerWidth < 768) {
-        targetPosition[0] = targetPosition[0] - 1;
-        targetPosition[1] = targetPosition[1] - 7;
+        targetPosition[0] = targetPosition[0] - 4.5;
+        targetPosition[1] = targetPosition[1] - 5;
         targetPosition[2] = targetPosition[2] + 8;
         buildCameraPos = {
             position: [3, 0, 5],
