@@ -11,6 +11,7 @@ import './index.scss';
 import HotWheels from './assets/models/Hotwheels';
 import WheelDefault from './assets/models/wheels/default/Wheel';
 import WheelOrange from './assets/models/wheels/orange/Wheel';
+import WheelBlob from './assets/models/wheels/blob/Wheel';
 
 import useSound from 'use-sound';
 import hydraulicSfx from './hydraulic.mp3';
@@ -88,6 +89,16 @@ const wheels = [
         features: [
             'Grabby'
         ]
+    },
+    {
+        id: 'blob',
+        //position: [0,0,-0.5],
+        name: 'Blob',
+        model: WheelBlob,
+        frame: true,
+        features: [
+            'Grabby'
+        ]
     }
 ]
 
@@ -125,6 +136,27 @@ const bodies = [
     {
         id: 'nugget',
         name: 'Chicken Nugget',
+        speed: 3,
+        agility: 3,
+        specialMove: 'Barbeque sauce sploosh',
+        features: [            
+            'Will never decompose',
+        ]
+    }
+    ,
+    {
+        id: 'aspirin',
+        name: 'Aspirin',
+        speed: 3,
+        agility: 3,
+        specialMove: 'Barbeque sauce sploosh',
+        features: [            
+            'Will never decompose',
+        ]
+    },     
+    {
+        id: 'chainsaw',
+        name: 'Chainsaw',
         speed: 3,
         agility: 3,
         specialMove: 'Barbeque sauce sploosh',
