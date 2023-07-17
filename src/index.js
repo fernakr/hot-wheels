@@ -97,7 +97,7 @@ const wheels = [
         model: WheelBlob,
         frame: true,
         features: [
-            'Grabby'
+            'Goopy'
         ]
     }
 ]
@@ -131,6 +131,8 @@ const bodies = [
         specialMove: 'Cuteness overload',
         features: [
             'Kneads',
+            'Purrs',
+            'Meows'
         ]
     },
     {
@@ -146,22 +148,23 @@ const bodies = [
     ,
     {
         id: 'aspirin',
-        name: 'Aspirin',
-        speed: 3,
-        agility: 3,
-        specialMove: 'Barbeque sauce sploosh',
+        name: 'Generic Bottle of Aspirin',
+        speed: 2,
+        agility: 1,
+        specialMove: 'Pain Relief',
         features: [            
-            'Will never decompose',
+            'Can only be used once every 4 to 6 hours',
         ]
     },     
     {
         id: 'chainsaw',
         name: 'Chainsaw',
-        speed: 3,
-        agility: 3,
-        specialMove: 'Barbeque sauce sploosh',
+        speed: 8,
+        agility: 2,
+        specialMove: 'Slice n dice',
         features: [            
-            'Will never decompose',
+            'Can also be used to cut down trees',
+
         ]
     }, 
     {
@@ -169,7 +172,10 @@ const bodies = [
         name: 'Torso',
         speed: 3,
         agility: 5,    
-        specialMove: 'Pectoral flex'
+        specialMove: 'Pectoral flex',
+        features: [
+            'Has a belly button',
+        ]
     }
 ];
 
