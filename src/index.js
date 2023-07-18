@@ -1,40 +1,42 @@
 import { createRoot } from 'react-dom/client'
 import React, { useRef, useState, useMemo, useEffect, Suspense } from 'react'
-import tinycolor from 'tinycolor2';
-//import { Bloom, DepthOfField, EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { useSpring, a, animated, config } from '@react-spring/three'
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+
+import tinycolor from 'tinycolor2';
+
 import { Carousel } from 'react-responsive-carousel';
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+
+import useSound from 'use-sound';
+
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
+import { PlaneGeometry } from 'three/src/geometries/PlaneGeometry.js';
+import { CylinderGeometry } from 'three/src/geometries/CylinderGeometry.js';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+
+import { Canvas, useFrame, useLoader, extend, useThree } from '@react-three/fiber'
+import { OrbitControls, Html, useAnimations, useGLTF } from '@react-three/drei'
+
+import * as THREE from 'three';
+
+import hydraulicSfx from './hydraulic.mp3';
+import hatchSfx from './hatch.m4a';
+import spraySfx from './spray.m4a';
 
 import './index.scss';
+
 import HotWheels from './assets/models/Hotwheels';
 import WheelDefault from './assets/models/wheels/default/Wheel';
 import WheelOrange from './assets/models/wheels/orange/Wheel';
 import WheelBlob from './assets/models/wheels/blob/Wheel';
-
-import useSound from 'use-sound';
-import hydraulicSfx from './hydraulic.mp3';
-import hatchSfx from './hatch.m4a';
-import spraySfx from './spray.m4a';
 
 import sparkleBackdrop from './assets/images/sparkle.gif';
 import flameBackdrop from './assets/images/fire.png';
 import asteroidBackdrop from './assets/images/asteroid.png';
 import hebBackdrop from './assets/images/heb.png';
 
-
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
-import { PlaneGeometry } from 'three/src/geometries/PlaneGeometry.js';
-import { CylinderGeometry } from 'three/src/geometries/CylinderGeometry.js';
-//import { BoxGeometry } from 'three/src/geometries/BoxGeometry.js';
-
-import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
-
-import { Canvas, useFrame, useLoader, extend, useThree } from '@react-three/fiber'
-import { OrbitControls, Html, useAnimations, useGLTF, useVideoTexture } from '@react-three/drei'
-import * as THREE from 'three';
-import myFont from './flash_rogers.typeface.json';
+import hotwheelsFont from './flash_rogers.typeface.json';
 
 const wheels = [
     {
@@ -57,7 +59,7 @@ const wheels = [
     },
     {
         id: 'tentacles',
-        position: [0,0,-0.5],
+        position: [0, 0, -0.5],
         name: 'Tentacles',
         front: false,
         frame: false,
@@ -83,11 +85,11 @@ const bodies = [
         name: 'Michael Jordan Head',
         speed: 9,
         agility: 8,
-        specialMove: 'Tongue out, leap over obstacles',     
-        features: [                    
+        specialMove: 'Tongue out, leap over obstacles',
+        features: [
             'Can also golf and play baseball'
         ]
-    }, 
+    },
     {
         id: 'heart',
         name: 'Human Heart',
@@ -95,9 +97,9 @@ const bodies = [
         agility: 3,
         specialMove: 'Pump blood',
         features: [
-            'Keeps you alive'            
+            'Keeps you alive'
         ]
-    }, 
+    },
     {
         id: 'kitten',
         name: 'Kitten',
@@ -116,7 +118,7 @@ const bodies = [
         speed: 3,
         agility: 3,
         specialMove: 'Barbeque sauce sploosh',
-        features: [            
+        features: [
             'Will never decompose',
         ]
     }
@@ -127,26 +129,26 @@ const bodies = [
         speed: 2,
         agility: 1,
         specialMove: 'Pain Relief',
-        features: [            
+        features: [
             'Can only be used once every 4 to 6 hours',
         ]
-    },     
+    },
     {
         id: 'chainsaw',
         name: 'Chainsaw',
         speed: 8,
         agility: 2,
         specialMove: 'Slice n dice',
-        features: [            
+        features: [
             'Can also be used to cut down trees',
 
         ]
-    }, 
+    },
     {
         id: 'torso',
         name: 'Torso',
         speed: 3,
-        agility: 5,    
+        agility: 5,
         specialMove: 'Pectoral flex',
         features: [
             'Has a belly button',
@@ -175,7 +177,7 @@ const pizzazzes = [
         id: 'flame',
         name: 'Fire',
         image: flameBackdrop,
-        repeat: [2, 1],             
+        repeat: [2, 1],
         yPosition: 1,
         features: [
             'Hot'
@@ -185,9 +187,9 @@ const pizzazzes = [
         id: 'asteroid',
         name: 'Asteroid',
         image: asteroidBackdrop,
-        repeat: [1, 1],  
+        repeat: [1, 1],
         width: 40,
-        height: 25,     
+        height: 25,
         features: [
             'End of the world'
         ]
@@ -199,7 +201,7 @@ const pizzazzes = [
         repeat: [1, 1],
         xPosition: 30,
         yPosition: 10,
-        height: 30,
+        height: 40,
         features: [
             'Amirite?'
         ]
@@ -210,37 +212,37 @@ const ModelViewer = ({ model, position, rotation, scale, clickHandler, visible =
     const gltf = useLoader(GLTFLoader, model)
     // apply position to model
     //const animations = useAnimations(gltf.animations);
-    return <primitive visible={ visible } onClick={clickHandler} object={gltf.scene} position={position} rotation={rotation} scale={scale} />
+    return <primitive visible={visible} onClick={clickHandler} object={gltf.scene} position={position} rotation={rotation} scale={scale} />
 }
 
 const checkColor = (c) => {
-     
- 
-     return tinycolor(c).isDark();
+
+
+    return tinycolor(c).isDark();
 }
 
 const Logo = ({ status, logoColor, logoColor2, stageColor }) => {
     let fontLoader = new FontLoader();
-    let textFont = fontLoader.parse(myFont);
+    let textFont = fontLoader.parse(hotwheelsFont);
 
     let darkMode = checkColor(stageColor);
 
-    
+
     if (!darkMode) {
         document.body.classList.add('is-light');
-    }else{
+    } else {
         document.body.classList.remove('is-light');
     }
-    
+
     const textOutput = [
         {
             text: 'The',
             size: 1,
-            position: [-7, 6.8, -2]       
+            position: [-7, 6.8, -2]
         },
         {
 
-            text: `"We'll make a car\n out of anything!!"`, 
+            text: `"We'll make a car\n out of anything!!"`,
             size: 0.7,
             position: [-3.25, 3.5, -2],
             color: '#EDD469'
@@ -251,15 +253,15 @@ const Logo = ({ status, logoColor, logoColor2, stageColor }) => {
             size: 0.5,
             position: [-3, 1.5, -2],
             color: '#DC803D'
-        }        
-        
-    ]    
+        }
+
+    ]
     extend({ TextGeometry });
-        
-    
+
+
     const springText = useSpring({
-        position: status !== 'staging' ? [0,0,0] : [0,40,0],
-        config: { duration: 250, tension: 30, friction: 20  }
+        position: status !== 'staging' ? [0, 0, 0] : [0, 40, 0],
+        config: { duration: 250, tension: 30, friction: 20 }
     });
 
     let logoPosition = [0, 3, -14];
@@ -267,7 +269,7 @@ const Logo = ({ status, logoColor, logoColor2, stageColor }) => {
     let inactiveLogoPosition = [...logoPosition];
     // change position on mobile
 
-    
+
     let logoStagingPosition = [...logoPosition];
 
     logoStagingPosition[0] = logoStagingPosition[0] - 3;
@@ -288,56 +290,57 @@ const Logo = ({ status, logoColor, logoColor2, stageColor }) => {
     const springLogo = useSpring({
         position: status === 'inactive' ? inactiveLogoPosition : (status === 'staging' ? logoStagingPosition : logoPosition),
         rotation: status === 'staging' ? [0, Math.PI / 15, 0] : [Math.PI / 20, 0, 0],
-        config: { duration: 1000, tension: 30, friction: 20  }
-        
+        config: { duration: 1000, tension: 30, friction: 20 }
+
     });
+    const fogImage = useLoader(THREE.TextureLoader, './assets/images/fog.png');
+    return (
+        <animated.group position={springLogo.position} rotation={springLogo.rotation}>
+                {/* <mesh position={[-1,3,-8]}>
+                    <planeGeometry attach="geometry" args={[15,10]} />
+                    <meshLambertMaterial transparent={true} 
+                    attach="material" map={fogImage} />
+                </mesh> */}
+                <HotWheels logoColor={logoColor} logoColor2={logoColor2} />
 
+                {textFont &&
+                    <animated.group position={springText.position}>
+                        {textOutput.map((text, i) => {
 
-    //console.log(position);
-    return (<animated.group position={springLogo.position} rotation={springLogo.rotation}>
-        <HotWheels logoColor={ logoColor } logoColor2={ logoColor2 }/>
-        
-        {textFont &&
-            <animated.group position={ springText.position }>
-                { textOutput.map((text, i) => {         
-
-                    let color = text.color ? text.color : 'white';
-                    if (!darkMode) {
-                        // invert color
-                       color = 'black';
-                    }
-                    return <group key={ i } position={text.position}>
-                        <mesh >
-                            <textGeometry attach="geometry" args={                            
-                                [text.text,{
-                                    font: textFont,
-                                    size: text.size,
-                                    height: .01
-                                }]
-                            } />
-                            <meshStandardMaterial attach="material" color={ color }  />
-                        </mesh>                       
-                        <mesh position={[0.025,-0.05,-0.05]}>
-                            <textGeometry attach="geometry"  args={                            
-                                [text.text,{
-                                    font: textFont,
-                                    size: text.size,
-                                    height: .01
-                                }]} 
-                            />
-                            <meshPhysicalMaterial 
-                            transmission={0.9}
-                            attach="material" color={!darkMode ? '#ddddcc' : 'navy'} />
-                        </mesh>
-                    </group>
-})}
+                            let color = text.color ? text.color : 'white';
+                            if (!darkMode) {
+                                // invert color
+                                color = 'black';
+                            }
+                            return <group key={i} position={text.position}>
+                                <mesh >
+                                    <textGeometry attach="geometry" args={
+                                        [text.text, {
+                                            font: textFont,
+                                            size: text.size,
+                                            height: .01
+                                        }]
+                                    } />
+                                    <meshStandardMaterial attach="material" color={color} />
+                                </mesh>
+                                <mesh position={[0.025, -0.05, -0.05]}>
+                                    <textGeometry attach="geometry" args={
+                                        [text.text, {
+                                            font: textFont,
+                                            size: text.size,
+                                            height: .01
+                                        }]}
+                                    />
+                                    <meshPhysicalMaterial
+                                        transmission={0.9}
+                                        attach="material" color={!darkMode ? '#ddddcc' : 'navy'} />
+                                </mesh>
+                            </group>
+                        })}
+                    </animated.group>
+                }
             </animated.group>
-        }
-        
-
-
-
-    </animated.group>)
+        )
 };
 
 
@@ -348,43 +351,40 @@ const Ground = ({ stageColor }) => {
     color.offsetHSL(0, 0, -0.1);
 
     return (<>
-        <mesh position={[0, -7, -4]} rotation={[-Math.PI/2,0,0]}>
+        <mesh position={[0, -7, -4]} rotation={[-Math.PI / 2, 0, 0]}>
 
             <planeGeometry attach="geometry" args={[100, 100]} />
-            <meshPhongMaterial roughness={0} clearcoat={0} attach="material" color={ color } />
+            <meshPhongMaterial roughness={0} clearcoat={0} attach="material" color={color} />
         </mesh>
     </>)
 }
 
 const Configurator = ({ status, carPosition, body, bodyColor, wheel, baseColor, wheelColor }) => {
-
-
-
     const Base = () => {
         extend({ CylinderGeometry })
         return (<>
-            <mesh receiveShadow position={[0, 0, 0]} rotation={[0, 0, 0]}  >            
+            <mesh receiveShadow position={[0, 0, 0]} rotation={[0, 0, 0]}  >
                 <cylinderGeometry attach="geometry" args={[4, 4.25, 0.4, 50, 2]} />
-                <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color={ baseColor } roughness={0} />
+                <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color={baseColor} roughness={0} />
             </mesh>
             <mesh receiveShadow position={[0, -2, 0]} rotation={[0, 0, 0]}  >
 
                 <shadowMaterial opacity={1} />
                 <cylinderGeometry attach="geometry" args={[4.25, 4.25, 3.6, 50, 4]} />
-                <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color={ baseColor }roughness={0} />
+                <meshPhysicalMaterial clearcoatRoughness={0} clearcoat={1} color={baseColor} roughness={0} />
             </mesh>
         </>)
     };
-    
-    const Car = ({ position, rotation, body, wheelColor, bodyColor, carPosition }) => {
-        
-        
+
+    const Car = ({ position, rotation, body, wheelColor, bodyColor }) => {
+
+
         const Axel = ({ position, rotation = [Math.PI / 2, 0, 0], size = 4 }) => {
             extend({ CylinderGeometry })
             return (<>
                 <group position={position}>
-                    <mesh position={[0, 1, -1]} rotation={rotation} material={ new THREE.MeshLambertMaterial({color: bodyColor}) }>
-                        <cylinderGeometry attach="geometry" args={[0.05, 0.05, size]} />                        
+                    <mesh position={[0, 1, -1]} rotation={rotation} material={new THREE.MeshLambertMaterial({ color: bodyColor })}>
+                        <cylinderGeometry attach="geometry" args={[0.05, 0.05, size]} />
                     </mesh>
                 </group>
             </>)
@@ -393,50 +393,50 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, baseColor, 
 
         const Wheels = ({ wheel, wheelColor }) => {
             const sides = ['left', 'right'];
-            const axels = ['back', 'front'];       
-            return wheels.map((wheelOutput, i) => (<group key={ i } visible={ wheel.id === wheelOutput.id }>     
-                { wheelOutput.model && 
+            const axels = ['back', 'front'];
+            return wheels.map((wheelOutput, i) => (<group key={i} visible={wheel.id === wheelOutput.id}>
+                {wheelOutput.model &&
                     axels.map((axel, i) => (
                         sides.map((side, i) => {
-                        let position = [0,0,0];
-                        let rotation = [0,0,0];
-                        let scale = [1,1,1];
-                        const frontOffset = 3;
-                        const leftOffset = 0;
-                        
-                        if (side === 'left') {
-                            position = [-1 * leftOffset, 0, -2.5];
-                            rotation = [0, Math.PI, 0];    
-                        }
-                        if (axel === 'front') {
-                            position = [0, 0, frontOffset];
+                            let position = [0, 0, 0];
+                            let rotation = [0, 0, 0];
+                            let scale = [1, 1, 1];
+                            const frontOffset = 3;
+                            const leftOffset = 0;
+
                             if (side === 'left') {
-                            position[2] = frontOffset - 2;
+                                position = [-1 * leftOffset, 0, -2.5];
+                                rotation = [0, Math.PI, 0];
                             }
-                            scale = [0.6, 0.6, 0.6];
-                        }
-                        return (
-                            <wheelOutput.model 
-                                color={ wheelColor}
-                                key={ i } 
-                                position={ position }
-                                rotation={ rotation }
-                                scale={ scale }
-                                side={ side } 
-                                axel={ axel }></wheelOutput.model>
+                            if (axel === 'front') {
+                                position = [0, 0, frontOffset];
+                                if (side === 'left') {
+                                    position[2] = frontOffset - 2;
+                                }
+                                scale = [0.6, 0.6, 0.6];
+                            }
+                            return (
+                                <wheelOutput.model
+                                    color={wheelColor}
+                                    key={i}
+                                    position={position}
+                                    rotation={rotation}
+                                    scale={scale}
+                                    side={side}
+                                    axel={axel}></wheelOutput.model>
                             )
                         })
-                ))}                                
-                { !wheelOutput.model && 
+                    ))}
+                {!wheelOutput.model &&
                     <ModelViewer
                         position={wheelOutput.position ? wheelOutput.position : [0, 0, 1]} scale={[0.8, 0.8, 0.8]}
                         model={`./assets/models/wheels/${wheelOutput.id}/wheels.gltf`}
-                    />                    
-                }
-                { wheelOutput.front && <ModelViewer
-                        position={[0, 0, 1]} scale={[0.8, 0.8, 0.8]}
-                        model={`./assets/models/wheels/${wheelOutput.id}/wheels-front.gltf`}
                     />
+                }
+                {wheelOutput.front && <ModelViewer
+                    position={[0, 0, 1]} scale={[0.8, 0.8, 0.8]}
+                    model={`./assets/models/wheels/${wheelOutput.id}/wheels-front.gltf`}
+                />
                 }
             </group>))
         };
@@ -446,11 +446,11 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, baseColor, 
             return (
                 <>
                     {Array.from({ length: 2 }).map((_, i) =>
-                    <Axel key={ i } position={[-0.25 + 0.75 * i, 1, -1.75]} rotation={[-Math.PI / 8, 0, 0]} size={2} />
+                        <Axel key={i} position={[-0.25 + 0.75 * i, 1, -1.75]} rotation={[-Math.PI / 8, 0, 0]} size={2} />
                     )}
                     <group position={[0, 3.2, -3]} >
-                        <mesh rotation={[Math.PI / 10, 0, 0]}  material={ new THREE.MeshLambertMaterial({color: bodyColor}) }>
-                            <boxGeometry args={[6, .1, 1.5]} />                            
+                        <mesh rotation={[Math.PI / 10, 0, 0]} material={new THREE.MeshLambertMaterial({ color: bodyColor })}>
+                            <boxGeometry args={[6, .1, 1.5]} />
                         </mesh>
                     </group>
                 </>
@@ -461,26 +461,26 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, baseColor, 
                 <group>
                     <Axel position={[0, 0, 3]} rotation={[0, 0, Math.PI / 2]} size={2} />
                     <Axel position={[0, 0.5, 0]} rotation={[0, 0, Math.PI / 2]} />
-                    { Array.from({ length: 2 }).map((_, i) =>
+                    {Array.from({ length: 2 }).map((_, i) =>
                     (
-                        <Axel key={ i } position={[-0.25 + 0.75 * i, 0, 0.75]} size={4.5} />
+                        <Axel key={i} position={[-0.25 + 0.75 * i, 0, 0.75]} size={4.5} />
                     ))}
-                    
+
                 </group>
             )
         }
         return (
             <animated.group rotation={rotation} position={position} >
-                
-                <Spoiler/>
+
+                <Spoiler />
                 <Suspense>
-                    <Wheels 
-                        wheelColor={ wheelColor }
+                    <Wheels
+                        wheelColor={wheelColor}
                         wheel={wheel} />
-                    { wheel.frame && <Frame />}               
+                    {wheel.frame && <Frame />}
                 </Suspense>
                 <Suspense>
-                    <Body body={body}  />            
+                    <Body body={body} />
                 </Suspense>
                 <Base />
 
@@ -488,20 +488,12 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, baseColor, 
         )
     };
 
-    // const changeBody = (defaultBody) => {
-    //     let index = bodies.findIndex(body => body.id === defaultBody.id);
-    //     index++;
-    //     if (index > bodies.length - 1) index = 0;
-    //     return bodies[index];
-    // }
+    
 
-    // on click change body
-
-
-    const Body = ({ position = [0,0,0], body, rotation, scale }) => (
+    const Body = ({ position = [0, 0, 0], body, rotation, scale }) => (
         bodies.map((bodyOutput, i) => (
-            <group visible={ bodyOutput.id === body.id }>
-                <ModelViewer                        
+            <group key={ i } visible={bodyOutput.id === body.id}>
+                <ModelViewer
                     model={`./assets/models/body/${bodyOutput.id}.gltf`}
                     position={position}
                     rotation={rotation}
@@ -512,249 +504,205 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, baseColor, 
 
     );
 
-    const startCarPosition = [...carPosition ];
+    const startCarPosition = [...carPosition];
     startCarPosition[1] = -4;
 
     const { position, rotation } = useSpring(
-            { 
-                    position: status !== 'inactive' ? startCarPosition : carPosition, rotation: status !== 'inactive' ? [0, Math.PI / 20, 0] : [0, - Math.PI / 9, 0], 
-                    config: { duration: 4000, tension: 300, friction: 20  }, // Set the duration to 1000 milliseconds (1 second)
-    })
+        {
+            position: status !== 'inactive' ? startCarPosition : carPosition, rotation: status !== 'inactive' ? [0, Math.PI / 20, 0] : [0, - Math.PI / 9, 0],
+            config: { duration: 4000, tension: 300, friction: 20 }, // Set the duration to 1000 milliseconds (1 second)
+        })
 
-    return (        
-        <Car wheelColor={ wheelColor } status={ status } body={body} bodyColor={ bodyColor} position={position} rotation={ rotation } />
+    return (
+        <Car 
+            wheelColor={wheelColor} status={status} body={body} bodyColor={bodyColor} position={position} rotation={rotation} />
     )
 }
 
-const BodyPreload = () => {    
-    return bodies.map((body, i) => {   
+const BodyPreload = () => {
+    return bodies.map((body, i) => {
         useGLTF.preload(`./assets/models/body/${body.id}.gltf`)
-        // return (
-                    
-        //     <ModelViewer    
-        //         key={ i }        
-        //         visible={ false }
-        //         position={ [-100, -100, 0] }                
-        //         model={`./assets/models/body/${body.id}.gltf`}
-        //     />        
-        // )})
     })
-        
+
 }
 
 const Backdrop = ({ pizzazz }) => {
     if (!pizzazz.image) return null;
-    const image = useLoader(THREE.TextureLoader, pizzazz.image);    
+    const image = useLoader(THREE.TextureLoader, pizzazz.image);
 
     // repeat texture to avoid stretching
     if (pizzazz.repeat) {
         image.wrapS = THREE.RepeatWrapping;
-        image.wrapT = THREE.RepeatWrapping;    
-        image.repeat.set( pizzazz.repeat[0], pizzazz.repeat[1] );    
+        image.wrapT = THREE.RepeatWrapping;
+        image.repeat.set(pizzazz.repeat[0], pizzazz.repeat[1]);
     }
     const xPosition = pizzazz.xPosition ? pizzazz.xPosition : 0;
     const yPosition = pizzazz.yPosition ? pizzazz.yPosition : 0;
     const width = pizzazz.width ? pizzazz.width : 100;
     const height = pizzazz.height ? pizzazz.height : 50;
 
-    // image.offset.x = xPosition;
-    // image.offset.y = yPosition;
-
     return (
         <group position={[xPosition, yPosition, -30]}>
-        <mesh >
-            <planeGeometry attach="geometry" args={[width, height]} />
-            <meshLambertMaterial transparent={ true } attach="material" map={image} />
-        </mesh>
-        </group>        
+            <mesh >
+                <planeGeometry attach="geometry" args={[width, height]} />
+                <meshLambertMaterial transparent={true} attach="material" map={image} />
+            </mesh>
+        </group>
     )
 }
 
-const WheelPreload = () => {    
-    return wheels.map((wheel, i) => { 
-             
+const WheelPreload = () => {
+    return wheels.map((wheel, i) => {
+
         let wheelTypes = [''];
         if (wheel.front) {
             wheelTypes = wheelTypes.concat('-front');
         }
 
         return wheelTypes.map((wheelType, i) => {
-            useGLTF.preload(`./assets/models/wheels/${wheel.id}/wheels${wheelType}.gltf`)            
+            useGLTF.preload(`./assets/models/wheels/${wheel.id}/wheels${wheelType}.gltf`)
         })
     })
-        
+
 }
 
 const Track = () => {
-    
-    const group = useRef();    
+
+    const group = useRef();
 
     const { scene, animations } = useGLTF("./assets/models/track.gltf", true);
     const { actions, mixer } = useAnimations(animations, group);
-    
-    useEffect(() => {            
+
+    useEffect(() => {
         //console.log(actions);
         actions['Chomper_Tooth (6).003_RotatingObstacletest_0Action'].play();
         actions['Sketchfab_model.001Action'].play();
     }, [mixer]);
-  
+
     return <primitive ref={group} object={scene} dispose={null} />;
-  }
-  
+}
+
 
 const Scene = ({ wheelColor, pizzazz, playHydraulic, status, setStatus, carPosition, body, bodyColor, wheel, stageColor, baseColor, logoColor, logoColor2 }) => {
 
+
+    // useFrame(() => {
+    //     // Perform any animation or updates here
+    // });
+
     
-    useFrame(() => {
-        // Perform any animation or updates here
-    });
-
-    // const videoTexture = useVideoTexture('./assets/videos/video.mp4');
-
     return (
-        <>          
-            <Suspense>           
-                <Backdrop pizzazz={ pizzazz }/>                                  
+        <>
+            <Suspense>
+                <Backdrop pizzazz={pizzazz} />
             </Suspense>
             <Suspense fallback={<Loader />}>
-                <BodyPreload  />
+                <BodyPreload />
                 <WheelPreload />
-                
-                <group 
-                    position={[-12, -7, -7]}
-                    rotation={[0,Math.PI/3,0]}
-                    scale={[52,52,52]} >
-                    <Track/>
-                </group>      
-                
-                <Ground stageColor={ stageColor } />
-                { status === 'inactive' && 
-                    <Html>
-                        <button className="button" onClick={() =>{ setTimeout(() => playHydraulic(),500); setStatus('active')}}>Build a Car 🔧</button>
-                    </Html>
-                }                
-                <Configurator wheelColor={ wheelColor } baseColor={ baseColor} wheel={ wheel } body={ body } bodyColor={ bodyColor } status={ status } carPosition={ carPosition} />            
-            
-            </Suspense> 
 
-                {/* <mesh>
-                    <planeGeometry attach="geometry" args={[16, 9]} />
-                    <Suspense>
-                    <meshBasicMaterial attach="material" map={videoTexture} toneMapped={ false } side={THREE.DoubleSide} />
-                    </Suspense>
-                </mesh> */}
-                       
+                <group
+                    position={[-12, -7, -7]}
+                    rotation={[0, Math.PI / 3, 0]}
+                    scale={[52, 52, 52]} >
+                    <Track />
+                </group>
+
+                <Ground stageColor={stageColor} />
+                {status === 'inactive' &&
+                    <Html>
+                        <button className="button" onClick={() => { setTimeout(() => playHydraulic(), 500); setStatus('active') }}>Build a Car 🔧</button>
+                    </Html>
+                }
+                <Configurator wheelColor={wheelColor} baseColor={baseColor} wheel={wheel} body={body} bodyColor={bodyColor} status={status} carPosition={carPosition} />
+
+            </Suspense>
 
             <pointLight position={[-10, 10, -10]} radius={10} intensity={0.5} castShadow />
             <pointLight position={[15, 0, 10]} intensity={1} castShadow />
             <spotLight position={[10, 0, -15]} intensity={status === 'inactive' ? 0 : 0.5} castShadow />
-            <ambientLight intensity={status === 'inactive' ? 0.3 : 0} castShadow />            
-            <Logo stageColor={ stageColor } status={ status } logoColor={ logoColor } logoColor2={ logoColor2 } />            
-            
+            <ambientLight intensity={status === 'inactive' ? 0.3 : 0} castShadow />
+            <Logo stageColor={stageColor} status={status} logoColor={logoColor} logoColor2={logoColor2} />
+
         </>
     );
 };
 
-const Loader = () => {    
+const Loader = () => {
     return (
         <Html>
-            <div className="loader">                
+            <div className="loader">
                 <span className='loader_text'>Loading...</span>
             </div>
-            
+
         </Html>
     )
 }
 
 
-
-// const Controls = () => {
-//     const { gl, camera } = useThree()
-//     return (
-//         /**
-//          * The args value with camera and gl are required to be passed to the OrbitControls
-//          * in order to allow the illusion of camera re-focus to work when click a pitstop.
-//          */
-//         <OrbitControls
-//         makeDefault
-//         target={[0, 0, 0]}
-//         args={[camera, gl.domElement]}
-//         maxDistance={10}
-//         minDistance={3}
-//         // vertical angle of the orbit
-//         // minPolarAngle={angleToRadians(45)}
-//         // maxPolarAngle={angleToRadians(80)}
-//         // // horizontal angle of the orbit
-//         // minAzimuthAngle={angleToRadians(-180)}
-//         // maxAzimuthAngle={angleToRadians(180)}
-//         />
-//     )
-// }
-
 const t = new THREE.Vector3();
 const defaultPosition = {
     position: [0, 0, 0],
-    target: [0,0,-10]
+    target: [0, 0, -10]
 };
 
-  
-  const CameraWrapper = ({ cameraPosition, target }) => {
-    const { camera } = useThree();
+
+const CameraWrapper = ({ cameraPosition, target }) => {
+    const { camera } = useThree();    
     camera.position.set(...cameraPosition);
     camera.lookAt(t.set(...target));
     return null;
-  };
-  
-  const ControlsWrapper = ({ target }) => {
+};
+
+const ControlsWrapper = ({ target }) => {
     const { controls } = useThree();
     if (controls) {
-      controls.target.set(...target);
+        controls.target.set(...target);
     }
     return null;
-  };
-  
-  function AnimateEyeToTarget({ position, target }) {
+};
+
+const AnimateEyeToTarget = ({ position, target }) => {
     const { camera, controls } = useThree();
-    
+
     const s = useSpring({
-      from: defaultPosition,
-      // Fun jelly-like animation
-      config: config.wobbly,
-      onStart: () => {
-        if (!controls) return;
-        controls.enabled = false;
-      },
-      onRest: () => {
-        if (!controls) return;
-        controls.enabled = true;
-      }
+        from: defaultPosition,
+        // Fun jelly-like animation
+        config: config.wobbly,
+        onStart: () => {
+            if (!controls) return;
+            controls.enabled = false;
+        },
+        onRest: () => {
+            if (!controls) return;
+            controls.enabled = true;
+        }
     });
-  
+
     s.position.start({ from: camera.position.toArray(), to: position });
     s.target.start({
-      from: controls ? controls.target.toArray() : [0, 0, 0],
-      to: target
+        from: controls ? controls.target.toArray() : [0, 0, 0],
+        to: target
     });
-  
+
     const AnimateControls = useMemo(() => a(ControlsWrapper), []);
     const AnimatedNavigation = useMemo(() => a(CameraWrapper), []);
-  
+
     return (
-      <>
-        <AnimatedNavigation cameraPosition={s.position} target={s.target} />
-        <AnimateControls target={s.target} />
-      </>
+        <>
+            <AnimatedNavigation cameraPosition={s.position} target={s.target} />
+            <AnimateControls target={s.target} />
+        </>
     );
-  }
-  
-  function EyeAnimation({ status, carPosition }) {
+}
+
+const EyeAnimation = ({ status, carPosition }) => {
 
 
     let targetPosition = [...carPosition]
 
     targetPosition[0] = targetPosition[0] + 3.5;
     targetPosition[1] = targetPosition[1] + 12;
-    targetPosition[2] = targetPosition[2] -7;
+    targetPosition[2] = targetPosition[2] - 7;
 
     // targetPosition[0] = targetPosition[0];
     // targetPosition[1] = targetPosition[1] + 14;
@@ -763,7 +711,7 @@ const defaultPosition = {
 
 
 
-    
+
     let buildCameraPos = {
         position: [5, 0, 2],
         target: targetPosition
@@ -778,10 +726,10 @@ const defaultPosition = {
             target: targetPosition
         }
     }
-    
+
     const inactiveCameraPos = {
         position: [-3, 0, 10],
-        target: [0,0,-10]
+        target: [0, 0, -10]
     };
 
     const stagingTargetPosition = [...carPosition];
@@ -793,55 +741,56 @@ const defaultPosition = {
         target: stagingTargetPosition
     };
     const [cameraSettings, setCameraSettings] = useState(defaultPosition);
-  
+
     useEffect(() => {
-      // switch statement
-      if (status === 'staging') {
-        setCameraSettings(stagingCameraPos);
-      }else if (status !== 'inactive') {
-        setCameraSettings(buildCameraPos);
-      } else {
-        setCameraSettings(inactiveCameraPos);
-      }
+        //console.log(status);
+        // switch statement
+        if (status === 'staging') {
+            setCameraSettings(stagingCameraPos);
+        } else if (status !== 'inactive') {
+            setCameraSettings(buildCameraPos);
+        } else {
+            setCameraSettings(inactiveCameraPos);
+        }
     }, [status]);
-  
+
     return (
-      <>
+    
         <AnimateEyeToTarget
-            
-          position={cameraSettings.position}
-          target={cameraSettings.target}
+
+            position={cameraSettings.position}
+            target={cameraSettings.target}
         />
-      </>
+    
     );
-  }
+}
 
 let glInstance;
 
 const App = () => {
-    const [ activePanel, setActivePanel ] = useState(0);
-    const [ status, setStatus ] = useState('inactive');
+    const [activePanel, setActivePanel] = useState(0);
+    const [status, setStatus] = useState('inactive');
 
     const defaultBody = bodies[0];
-    const [body, setBody] = useState(defaultBody);    
-    const defaultBodyColor  = '#ffffff';
+    const [body, setBody] = useState(defaultBody);
+    const defaultBodyColor = '#ffffff';
     const [bodyColor, setBodyColor] = useState(defaultBodyColor);
-    
-    
+
+
     const defaultWheel = wheels[0];
     const [wheel, setWheel] = useState(defaultWheel);
     const defaultWheelColor = '#222222';
     const [wheelColor, setWheelColor] = useState(defaultWheelColor);
-    
+
     const defaultPizzazz = pizzazzes[0];
     const [pizzazz, setPizzazz] = useState(defaultPizzazz);
-    
+
     const [playHydraulic] = useSound(hydraulicSfx, { volume: 0.5 })
     const [playHatch] = useSound(hatchSfx, { volume: 0.5 })
     const [playSpray] = useSound(spraySfx, { volume: 0.25 })
-    
+
     const carPosition = [2, -12, -7];
-    
+
     const defaultStageColor = '#0000cc';
     const [stageColor, setStageColor] = useState(defaultStageColor);
     const defaultBaseColor = '#999999';
@@ -857,7 +806,7 @@ const App = () => {
     const panels = [
         {
             id: 'body',
-            name: 'Body'            
+            name: 'Body'
         },
         {
             id: 'wheels',
@@ -878,7 +827,7 @@ const App = () => {
 
     // on mouse move reset timer
     document.addEventListener('mousemove', () => {
-        clearTimeout(timer);        
+        clearTimeout(timer);
         timer = setTimeout(() => {
             setStatus('inactive');
             reset();
@@ -897,28 +846,35 @@ const App = () => {
         setLogoColor(defaultLogoColor);
         setLogoColor2(defaultLogoColor2);
         setShareImage(null);
-        
+
+    }
+
+    const getRandomColor = () => {
+        let color = Math.floor(Math.random() * 16777215).toString(16);
+        // make sure hex value padstart
+        color = color.padStart(6, '0');
+        return '#' + color;
     }
 
     const randomize = () => {
         const randomBody = bodies[Math.floor(Math.random() * bodies.length)];
         const randomWheel = wheels[Math.floor(Math.random() * wheels.length)];
         const randomPizzazz = pizzazzes[Math.floor(Math.random() * pizzazzes.length)];
-        
+
         setBody(randomBody);
         setWheel(randomWheel);
-        
+
         setPizzazz(randomPizzazz);
-        setBodyColor('#' + Math.floor(Math.random()*16777215).toString(16));
-        setStageColor('#' + Math.floor(Math.random()*16777215).toString(16));
-        setBaseColor('#' + Math.floor(Math.random()*16777215).toString(16));
-        setLogoColor('#' + Math.floor(Math.random()*16777215).toString(16));
-        setLogoColor2('#' + Math.floor(Math.random()*16777215).toString(16));
-        setWheelColor('#' + Math.floor(Math.random()*16777215).toString(16));
+        setBodyColor(getRandomColor());
+        setStageColor(getRandomColor());
+        setBaseColor(getRandomColor());
+        setLogoColor(getRandomColor());
+        setLogoColor2(getRandomColor());
+        setWheelColor(getRandomColor());
     }
 
-    const sendPhoto = () => {        
-//        const image = shareImage;
+    const sendPhoto = () => {
+        //        const image = shareImage;
         // shareImage to base64 encoding
 
         //console.log(shareImage);
@@ -956,17 +912,17 @@ const App = () => {
     return (
         <>
 
-            { status !== 'inactive' && <button className='start-over button' onClick={() => {
+            {status !== 'inactive' && <button className='start-over button' onClick={() => {
                 setStatus('inactive');
                 reset();
             }}>Start over 🔁</button>}
-            { shareImage && 
-                <div className="image_wrapper">     
-                    <div className="image_overlay" onClick={() => setShareImage(null)}></div>               
+            {shareImage &&
+                <div className="image_wrapper">
+                    <div className="image_overlay" onClick={() => setShareImage(null)}></div>
                     <div className='image'>
-                        <img src={ shareImage } />                        
+                        <img src={shareImage} />
                         <div className="image_options">
-                            
+
                             <button className="button secondary" onClick={() => {
                                 const link = document.createElement('a');
                                 link.href = shareImage;
@@ -977,182 +933,187 @@ const App = () => {
                             }}>
                                 Download image ⬇️
                             </button>
-                            <button className="button" onClick={() =>{ 
+                            <button className="button" onClick={() => {
                                 sendPhoto();
                             }}>Send Picture to Email 📧</button>
                         </div>
                     </div>
                 </div>
             }
-            { status === 'staging' &&
-            
+            {status === 'staging' &&
+
                 <div className="staging">
                     {/* Take a picture  */}
-                    { !shareImage && <button className="button" onClick={() =>{ 
+                    {!shareImage && <button className="button" onClick={() => {
                         // output canvas and set image as open graph image for the page
                         const canvas = glInstance.domElement;
                         const image = canvas.toDataURL('image/png');
 
-                        
+
                         setShareImage(image);
 
                     }}>Take a Picture 📷</button>
                     }
-                    { shareImage && <button className="button" onClick={() =>{ exitImage(); }}>Retake Picture 👈</button>}
+                    {shareImage && <button className="button" onClick={() => { exitImage(); }}>Retake Picture 👈</button>}
                     { /* Share on social media */}
-                
+
                     {/* Back to build */}
-                    <button className="button secondary" onClick={() =>{ setStatus('active'); setShareImage(null)}}>Back to Build 👈</button>
+                    <button className="button secondary" onClick={() => { setStatus('active'); setShareImage(null) }}>Back to Build 👈</button>
                 </div>
-            
-            }              
-            <div className={`details_wrapper ${ status === 'active' && body ? 'is-active' : ''}`}>     
-                <button style={{ marginBottom: '20px' }} className="button secondary" onClick={() =>{  randomize(); }}>Randomize 🔀</button>
+
+            }
+            <div className={`details_wrapper ${status === 'active' && body ? 'is-active' : ''}`}>
+                <button style={{ marginBottom: '20px' }} className="button secondary" onClick={() => { randomize(); }}>Randomize 🔀</button>
                 <div className="details_nav">
-                    { panels.map((panel, index) =>
-                        <button key={ index } className={ `panel_nav ${activePanel === index ? 'is-active': ''}`} onClick={ () => setActivePanel(index)}>
-                            { panel.name }
+                    {panels.map((panel, index) =>
+                        <button key={index} className={`panel_nav ${activePanel === index ? 'is-active' : ''}`} onClick={() => setActivePanel(index)}>
+                            {panel.name}
                         </button>
-                    ) }
+                    )}
 
 
-                </div> 
+                </div>
                 <div className="details_content">
-                    { activePanel === 0 &&
+                    {activePanel === 0 &&
                         <div className="panel">
-                            <h2>Body Type</h2>                                 
-                            <Carousel selectedItem={bodies.findIndex(b => b.id === body.id)} dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setBody(bodies[index])} }>
-                                { bodies.map((body, index) =>             
-                                        (
-                                            <div className='details' key={ index }>
-                                                <h3>{ body.name }</h3>
-                                                
-                                                <div key={ index } className='details_body'>                                                    
+                            <h2>Body Type</h2>
+                            <Carousel selectedItem={bodies.findIndex(b => b.id === body.id)} dynamicHeight={true} showThumbs={false} showStatus={false} infiniteLoop={true} showIndicators={false} onChange={(index) => { playHatch(); setBody(bodies[index]) }}>
+                                {bodies.map((body, index) =>
+                                (
+                                    <div className='details' key={index}>
+                                        <h3>{body.name}</h3>
+
+                                        <div key={index} className='details_body'>
+                                            <ul>
+                                                {body.speed && <li><span className='label'>Speed:</span> {body.speed}</li>}
+                                                {body.agility && <li><span className='label'>Agility:</span> {body.agility}</li>}
+                                                {body.specialMove && <li className='small'><span className='label display-block'>Special Move:</span> {body.specialMove}</li>}
+                                                {body.features && <li className='small'><span className='label display-block'>Features:</span>
                                                     <ul>
-                                                        { body.speed && <li><span className='label'>Speed:</span> { body.speed }</li> }
-                                                        { body.agility && <li><span className='label'>Agility:</span> { body.agility }</li> }                            
-                                                        { body.specialMove && <li className='small'><span className='label display-block'>Special Move:</span> { body.specialMove }</li> }
-                                                        { body.features && <li className='small'><span className='label display-block'>Features:</span>
-                                                            <ul>
-                                                                { body.features.map((feature, featureIndex) => <li key={featureIndex}>{ feature }</li>) }                                                                                                        
-                                                            </ul>
-                                                        </li> }
+                                                        {body.features.map((feature, featureIndex) => <li key={featureIndex}>{feature}</li>)}
                                                     </ul>
-                                                </div>
-                                            </div>
-                                        )
-                                ) }
+                                                </li>}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                )
+                                )}
                             </Carousel>
-                            <h2>Body Color</h2>                    
-                            <input type="color" value={ bodyColor } onChange={(e) => {playSpray(); setBodyColor(e.target.value)}}/>
+                            <h2>Body Color</h2>
+                            <input type="color" value={bodyColor} onChange={(e) => { playSpray(); setBodyColor(e.target.value) }} />
                         </div>
                     }
-                    { activePanel === 1 &&
+                    {activePanel === 1 &&
                         <div className="panel">
                             <h2>Wheel Type</h2>
-                            <Carousel selectedItem={wheels.findIndex(w => w.id === wheel.id)} dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setWheel(wheels[index])} }>
-                                { wheels.map((wheel, index) =>             
-                                        (
+                            <Carousel selectedItem={wheels.findIndex(w => w.id === wheel.id)} dynamicHeight={true} showThumbs={false} showStatus={false} infiniteLoop={true} showIndicators={false} onChange={(index) => { playHatch(); setWheel(wheels[index]) }}>
+                                {wheels.map((wheel, index) =>
+                                (
 
-                                            <div key={ index } className='details'>
-                                                <h3>{ wheel.name }</h3>
-                                                <div className="details_body">
-                                                    <ul>                                                                  
-                                                        { wheel.features.map((feature, index) => <li key={index}>{ feature }</li>) }                                        
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        )
-                                ) }
+                                    <div key={index} className='details'>
+                                        <h3>{wheel.name}</h3>
+                                        <div className="details_body">
+                                            <ul>
+                                                {wheel.features.map((feature, index) => <li key={index}>{feature}</li>)}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                )
+                                )}
                             </Carousel>
-                            { wheel.id === 'default' && 
-                            <>
-                                <h2>Wheel Color</h2>                    
-                                <input type="color" value={ wheelColor } onChange={(e) => {playSpray(); setWheelColor(e.target.value)}}/>
-                            </>}
+                            {wheel.id === 'default' &&
+                                <>
+                                    <h2>Wheel Color</h2>
+                                    <input type="color" value={wheelColor} onChange={(e) => { playSpray(); setWheelColor(e.target.value) }} />
+                                </>}
                         </div>
                     }
-                    { activePanel === 2 &&
+                    {activePanel === 2 &&
                         <div className="panel">
-                            <h2>Pizzazz</h2>                            
-                            <Carousel selectedItem={ pizzazzes.findIndex(p => p.id === pizzazz.id) } dynamicHeight={ true } showThumbs={ false } showStatus={ false } infiniteLoop={ true } showIndicators={ false } onChange={ (index) => { playHatch(); setPizzazz(pizzazzes[index])} }>
-                                { pizzazzes.map((pizzazz, index) =>             
-                                        (
+                            <h2>Pizzazz</h2>
+                            <Carousel selectedItem={pizzazzes.findIndex(p => p.id === pizzazz.id)} dynamicHeight={true} showThumbs={false} showStatus={false} infiniteLoop={true} showIndicators={false} onChange={(index) => { playHatch(); setPizzazz(pizzazzes[index]) }}>
+                                {pizzazzes.map((pizzazz, index) =>
+                                (
 
-                                            <div key={ index } className='details'>
-                                                <h3>{ pizzazz.name }</h3>
-                                                <div className="details_body">
-                                                    <ul>
-                                                        { pizzazz.features.map((feature, index) => <li key={index}>{ feature }</li>) }
-                                                    </ul>
-                                                </div>
+                                    <div key={index} className='details'>
+                                        <h3>{pizzazz.name}</h3>
+                                        <div className="details_body">
+                                            <ul>
+                                                {pizzazz.features.map((feature, index) => <li key={index}>{feature}</li>)}
+                                            </ul>
+                                        </div>
 
-                                              
-                                            </div>
-                                        )
-                                ) }
+
+                                    </div>
+                                )
+                                )}
                             </Carousel>
-                            <h2>Stage Color</h2>                    
-                            <input type="color" value={ stageColor } onChange={(e) => {playSpray(); setStageColor(e.target.value)}}/>
-                            <h2>Base Color</h2>                    
-                            <input type="color" value={ baseColor } onChange={(e) => {playSpray(); setBaseColor(e.target.value)}}/>
-                            <h2>Logo Flame Color</h2>                                                
-                            <input type="color" value={ logoColor } onChange={(e) => {playSpray(); setLogoColor(e.target.value)}}/>
-                            <h2>Logo Text Color</h2>                    
-                            <input type="color" value={ logoColor2 } onChange={(e) => {playSpray(); setLogoColor2(e.target.value)}}/>
+                            <h2>Stage Color</h2>
+                            <input type="color" value={stageColor} onChange={(e) => { playSpray(); setStageColor(e.target.value) }} />
+                            <h2>Base Color</h2>
+                            <input type="color" value={baseColor} onChange={(e) => { playSpray(); setBaseColor(e.target.value) }} />
+                            <h2>Logo Flame Color</h2>
+                            <input type="color" value={logoColor} onChange={(e) => { playSpray(); setLogoColor(e.target.value) }} />
+                            <h2>Logo Text Color</h2>
+                            <input type="color" value={logoColor2} onChange={(e) => { playSpray(); setLogoColor2(e.target.value) }} />
                         </div>
                     }
 
                 </div>
-                                   
 
-                <button style={{ marginTop: '20px' }} className="button" onClick={() =>{  setTimeout(() => playHydraulic(),500); setStatus('staging')}}>Ready for Photos! 🔥</button>
-            </div>                
-            
-        
-            
-            <Canvas  gl={{ preserveDrawingBuffer: true }} 
+
+                <button style={{ marginTop: '20px' }} className="button" onClick={() => { setTimeout(() => playHydraulic(), 500); setStatus('staging') }}>Ready for Photos! 🔥</button>
+            </div>
+
+
+
+            <Canvas 
+                gl={{ preserveDrawingBuffer: true }}
                 onCreated={({ gl }) => {
                     glInstance = gl;
                 }}
             >
-                  <color attach="background" args={[stageColor]} />
-            <OrbitControls makeDefault                   
-                enablePan={false } 
-                enableZoom={status === 'staging'}               
-                minDistance={ 3 }
-                maxDistance={ 20 }
-                minPolarAngle={-Math.PI/8}
-                maxPolarAngle={Math.PI/2 + Math.PI/20}
-                    
-            />
-            <EyeAnimation status={ status } carPosition={ carPosition }/>
-            
+                <color attach="background" args={[stageColor]} />
+                <OrbitControls makeDefault
+                    enablePan={false}
+                    enableZoom={status === 'staging'}
+                    minDistance={3}
+                    maxDistance={20}
+                    minPolarAngle={-Math.PI / 8}
+                    maxPolarAngle={Math.PI / 2 + Math.PI / 20}
+
+                />
+                <EyeAnimation 
+                    status={status} 
+                    carPosition={carPosition} />
+
+
                 
-            {/* <XR> */}
-                {/* <Hands/>
-                <Controllers/> */}
-                <Scene pizzazz={ pizzazz } wheelColor={ wheelColor } playHydraulic={ playHydraulic } logoColor={ logoColor } logoColor2={ logoColor2} body={ body } bodyColor={ bodyColor } wheel={ wheel } pizzazz={ pizzazz} status={ status } setStatus={ setStatus }  carPosition={ carPosition } stageColor={stageColor} baseColor={ baseColor }/>
+                <Scene 
+                    pizzazz={pizzazz} 
+                    wheelColor={wheelColor} 
+                    playHydraulic={playHydraulic} 
+                    logoColor={logoColor} 
+                    logoColor2={logoColor2} 
+                    body={body} 
+                    bodyColor={bodyColor} 
+                    wheel={wheel} 
+                    status={status} 
+                    setStatus={setStatus} 
+                    carPosition={carPosition} 
+                    stageColor={stageColor} 
+                    baseColor={baseColor} />
 
-                {/* <EffectComposer>
-
-                    <Vignette eskil={false} offset={0.1} darkness={1.1} />
-                </EffectComposer> */}
-
-                {/* <SoftShadows size={{ value: 25, min: 0, max: 100 }}
-                    focus={{ value: 0, min: 0, max: 2 }}
-                    samples={{ value: 10, min: 1, max: 20, step: 1 }} /> */}
-            {/* </XR> */}
-        </Canvas>    
+            </Canvas>
         </>
     )
-       
+
 }
 
 
 createRoot(document.getElementById('root')).render(
     <>
-         <App/>
+        <App />
     </>
-,
+    ,
 )
