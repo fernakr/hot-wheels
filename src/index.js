@@ -183,7 +183,6 @@ const pizzazzes = [
         id: 'asteroid',
         name: 'Asteroid',
         image: asteroidBackdrop,
-        yPosition: 4,
         repeat: [1, 1],            
         features: [
             'End of the world'
@@ -535,7 +534,7 @@ const Backdrop = ({ pizzazz }) => {
     if (pizzazz.repeat) {
         image.wrapS = THREE.RepeatWrapping;
         image.wrapT = THREE.RepeatWrapping;    
-        image.repeat.set( pizzazz.repeat );    
+        image.repeat.set( pizzazz.repeat[0], pizzazz.repeat[1] );    
     }
     
     const yPosition = pizzazz.yPosition ? pizzazz.yPosition : 0;
