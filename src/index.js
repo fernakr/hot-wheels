@@ -32,7 +32,7 @@ import { CylinderGeometry } from 'three/src/geometries/CylinderGeometry.js';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 
 import { Canvas, useFrame, useLoader, extend, useThree } from '@react-three/fiber'
-import { OrbitControls, Html, useAnimations, useGLTF, Preload } from '@react-three/drei'
+import { OrbitControls, Html, useAnimations, useGLTF, useVideoTexture } from '@react-three/drei'
 import * as THREE from 'three';
 import myFont from './flash_rogers.typeface.json';
 
@@ -609,7 +609,7 @@ const Scene = ({ wheelColor, pizzazz, playHydraulic, status, setStatus, carPosit
         // Perform any animation or updates here
     });
 
-
+    // const videoTexture = useVideoTexture('./assets/videos/video.mp4');
 
     return (
         <>          
@@ -635,7 +635,16 @@ const Scene = ({ wheelColor, pizzazz, playHydraulic, status, setStatus, carPosit
                 }                
                 <Configurator wheelColor={ wheelColor } baseColor={ baseColor} wheel={ wheel } body={ body } bodyColor={ bodyColor } status={ status } carPosition={ carPosition} />            
             
-            </Suspense>
+            </Suspense> 
+
+                {/* <mesh>
+                    <planeGeometry attach="geometry" args={[16, 9]} />
+                    <Suspense>
+                    <meshBasicMaterial attach="material" map={videoTexture} toneMapped={ false } side={THREE.DoubleSide} />
+                    </Suspense>
+                </mesh> */}
+                       
+
             <pointLight position={[-10, 10, -10]} radius={10} intensity={0.5} castShadow />
             <pointLight position={[15, 0, 10]} intensity={1} castShadow />
             <spotLight position={[10, 0, -15]} intensity={status === 'inactive' ? 0 : 0.5} castShadow />
@@ -952,7 +961,8 @@ const App = () => {
                 reset();
             }}>Start over 🔁</button>}
             { shareImage && 
-                <div className="image_wrapper">                    
+                <div className="image_wrapper">     
+                    <div className="image_overlay" onClick={() => setShareImage(null)}></div>               
                     <div className='image'>
                         <img src={ shareImage } />                        
                         <div className="image_options">

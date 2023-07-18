@@ -1,7 +1,21 @@
 {
   "files": {
+<<<<<<< HEAD
     "main.css": "./static/css/main.11f2cb10.css",
     "main.js": "./static/js/main.f7bc0e9b.js",
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    "main.css": "./static/css/main.11f2cb10.css",
+=======
+    "main.css": "./static/css/main.2cd13210.css",
+>>>>>>> 0b7e3c8 (deploy)
+    "main.js": "./static/js/main.7f6d0ab3.js",
+=======
+    "main.css": "./static/css/main.678fd6a5.css",
+    "main.js": "./static/js/main.f01c186c.js",
+>>>>>>> 8dad140 (deploy)
+>>>>>>> 3953dce (recompile)
     "static/js/845.5be44460.chunk.js": "./static/js/845.5be44460.chunk.js",
     "static/media/heb.png": "./static/media/heb.2e992aabac9a0b0785ed.png",
     "static/media/loader.gif": "./static/media/loader.b19cf4dee32ebdd3a657.gif",
@@ -13,12 +27,33 @@
     "static/media/AUdimat-Bold.ttf": "./static/media/AUdimat-Bold.7b0e503b5a9753014b3d.ttf",
     "static/media/spray.m4a": "./static/media/spray.4bed552eba37edb8f650.m4a",
     "index.html": "./index.html",
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 3953dce (recompile)
     "main.11f2cb10.css.map": "./static/css/main.11f2cb10.css.map",
     "main.f7bc0e9b.js.map": "./static/js/main.f7bc0e9b.js.map",
     "845.5be44460.chunk.js.map": "./static/js/845.5be44460.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.11f2cb10.css",
+<<<<<<< HEAD
     "static/js/main.f7bc0e9b.js"
+=======
+=======
+    "static/css/main.2cd13210.css",
+>>>>>>> 0b7e3c8 (deploy)
+    "static/js/main.7f6d0ab3.js"
+=======
+    "main.678fd6a5.css.map": "./static/css/main.678fd6a5.css.map",
+    "main.f01c186c.js.map": "./static/js/main.f01c186c.js.map",
+    "845.5be44460.chunk.js.map": "./static/js/845.5be44460.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.678fd6a5.css",
+    "static/js/main.f01c186c.js"
+>>>>>>> 8dad140 (deploy)
+>>>>>>> 3953dce (recompile)
   ]
 }
