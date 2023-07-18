@@ -21,6 +21,7 @@ import spraySfx from './spray.m4a';
 import sparkleBackdrop from './assets/images/sparkle.gif';
 import flameBackdrop from './assets/images/fire.png';
 import asteroidBackdrop from './assets/images/asteroid.png';
+import hebBackdrop from './assets/images/heb.png';
 
 
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
@@ -184,10 +185,20 @@ const pizzazzes = [
         id: 'asteroid',
         name: 'Asteroid',
         image: asteroidBackdrop,
-        repeat: [1, 1],
-        yPosition: 4,            
+        repeat: [1, 1],        
         features: [
             'End of the world'
+        ]
+    },
+    {
+        id: 'heb',
+        name: 'HEB Parking Lot',
+        image: hebBackdrop,
+        repeat: [1, 1],
+        xPosition: 1,
+        yPosition: 0.4,
+        features: [
+            'How many times do I go to HEB in a week?'
         ]
     }
 ]
@@ -538,14 +549,19 @@ const Backdrop = ({ pizzazz }) => {
         image.wrapT = THREE.RepeatWrapping;    
         image.repeat.set( pizzazz.repeat[0], pizzazz.repeat[1] );    
     }
-    
+    const xPosition = pizzazz.xPosition ? pizzazz.xPosition : 0;
     const yPosition = pizzazz.yPosition ? pizzazz.yPosition : 0;
 
+    // image.offset.x = xPosition;
+    // image.offset.y = yPosition;
+
     return (
-        <mesh position={[0,yPosition,-30]}>
-            <planeGeometry attach="geometry" args={[60, 40]} />
+        <group position={[xPosition, yPosition, -13]}>
+        <mesh >
+            <planeGeometry attach="geometry" args={[100, 50]} />
             <meshLambertMaterial transparent={ true } attach="material" map={image} />
         </mesh>
+        </group>        
     )
 }
 
