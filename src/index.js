@@ -175,7 +175,7 @@ const pizzazzes = [
         id: 'flame',
         name: 'Fire',
         image: flameBackdrop,
-        repeat: [2, 1],     
+        repeat: [2, 1],             
         yPosition: 1,
         features: [
             'Hot'
@@ -185,7 +185,9 @@ const pizzazzes = [
         id: 'asteroid',
         name: 'Asteroid',
         image: asteroidBackdrop,
-        repeat: [1, 1],        
+        repeat: [1, 1],  
+        width: 40,
+        height: 25,     
         features: [
             'End of the world'
         ]
@@ -195,10 +197,11 @@ const pizzazzes = [
         name: 'HEB Parking Lot',
         image: hebBackdrop,
         repeat: [1, 1],
-        xPosition: 1,
-        yPosition: 0.4,
+        xPosition: 30,
+        yPosition: 10,
+        height: 30,
         features: [
-            'How many times do I go to HEB in a week?'
+            'Amirite?'
         ]
     }
 ]
@@ -551,14 +554,16 @@ const Backdrop = ({ pizzazz }) => {
     }
     const xPosition = pizzazz.xPosition ? pizzazz.xPosition : 0;
     const yPosition = pizzazz.yPosition ? pizzazz.yPosition : 0;
+    const width = pizzazz.width ? pizzazz.width : 100;
+    const height = pizzazz.height ? pizzazz.height : 50;
 
     // image.offset.x = xPosition;
     // image.offset.y = yPosition;
 
     return (
-        <group position={[xPosition, yPosition, -13]}>
+        <group position={[xPosition, yPosition, -30]}>
         <mesh >
-            <planeGeometry attach="geometry" args={[100, 50]} />
+            <planeGeometry attach="geometry" args={[width, height]} />
             <meshLambertMaterial transparent={ true } attach="material" map={image} />
         </mesh>
         </group>        
