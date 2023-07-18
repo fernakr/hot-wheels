@@ -20,9 +20,10 @@ import { OrbitControls, Html, useAnimations, useGLTF } from '@react-three/drei'
 
 import * as THREE from 'three';
 
-import hydraulicSfx from './hydraulic.mp3';
-import hatchSfx from './hatch.m4a';
-import spraySfx from './spray.m4a';
+import trackAudio from './assets/audio/track.mp3'
+import hydraulicSfx from './assets/audio/hydraulic.mp3';
+import hatchSfx from './assets/audio/hatch.m4a';
+import spraySfx from './assets/audio/spray.m4a';
 
 import './index.scss';
 
@@ -583,7 +584,7 @@ const Track = () => {
 }
 
 
-const Scene = ({ wheelColor, pizzazz, playHydraulic, status, setStatus, carPosition, body, bodyColor, wheel, stageColor, baseColor, logoColor, logoColor2 }) => {
+const Scene = ({ wheelColor, playTrack,  pizzazz, playHydraulic, status, setStatus, carPosition, body, bodyColor, wheel, stageColor, baseColor, logoColor, logoColor2 }) => {
 
 
     // useFrame(() => {
@@ -610,7 +611,7 @@ const Scene = ({ wheelColor, pizzazz, playHydraulic, status, setStatus, carPosit
                 <Ground stageColor={stageColor} />
                 {status === 'inactive' &&
                     <Html>
-                        <button className="button" onClick={() => { setTimeout(() => playHydraulic(), 500); setStatus('active') }}>Build a Car 🔧</button>
+                        <button className="button" onClick={() => { setTimeout(() => playHydraulic(), 500); playTrack(); setStatus('active') }}>Build a Car 🔧</button>
                     </Html>
                 }
                 <Configurator wheelColor={wheelColor} baseColor={baseColor} wheel={wheel} body={body} bodyColor={bodyColor} status={status} carPosition={carPosition} />
@@ -788,6 +789,7 @@ const App = () => {
     const [playHydraulic] = useSound(hydraulicSfx, { volume: 0.5 })
     const [playHatch] = useSound(hatchSfx, { volume: 0.5 })
     const [playSpray] = useSound(spraySfx, { volume: 0.25 })
+    const [playTrack] = useSound(trackAudio, { volume: 0.5, loop: true })
 
     const carPosition = [2, -12, -7];
 
@@ -1092,6 +1094,7 @@ const App = () => {
                 <Scene 
                     pizzazz={pizzazz} 
                     wheelColor={wheelColor} 
+                    playTrack={ playTrack }
                     playHydraulic={playHydraulic} 
                     logoColor={logoColor} 
                     logoColor2={logoColor2} 

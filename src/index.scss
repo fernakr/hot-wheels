@@ -9,6 +9,10 @@ $border-left-color_1: yellow;
 
 $mobile-breakpoint: 768px;
 
+// audio{
+// 	pointer-events: none;
+// }
+
 @mixin mobile {
     @media (max-width: $mobile-breakpoint) {
         @content;
