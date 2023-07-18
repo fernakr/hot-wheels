@@ -18,7 +18,9 @@ import hydraulicSfx from './hydraulic.mp3';
 import hatchSfx from './hatch.m4a';
 import spraySfx from './spray.m4a';
 
-import sparkle from './assets/images/sparkle.gif';
+import sparkleBackdrop from './assets/images/sparkle.gif';
+import flameBackdrop from './assets/images/fire.png';
+import asteroidBackdrop from './assets/images/asteroid.png';
 
 
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
@@ -155,11 +157,37 @@ const pizzazzes = [
     {
         id: 'none',
         name: 'None',
+        features: [
+            'Nada, zilch, nothing'
+        ]
     },
     {
         id: 'sparkle',
         name: 'Sparkle',
-        image: sparkle
+        image: sparkleBackdrop,
+        repeat: [4, 4],
+        features: [
+            'Shiny'
+        ]
+    },
+    {
+        id: 'flame',
+        name: 'Fire',
+        image: flameBackdrop,
+        repeat: [3, 1],     
+        features: [
+            'Hot'
+        ]
+    },
+    {
+        id: 'asteroid',
+        name: 'Asteroid',
+        image: asteroidBackdrop,
+        yPosition: 4,
+        repeat: [1, 1],            
+        features: [
+            'End of the world'
+        ]
     }
 ]
 
@@ -313,7 +341,7 @@ const Ground = ({ stageColor }) => {
     </>)
 }
 
-const Configurator = ({ status, carPosition, body, bodyColor, wheel, pizzazz, baseColor, wheelColor }) => {
+const Configurator = ({ status, carPosition, body, bodyColor, wheel, baseColor, wheelColor }) => {
 
 
 
@@ -499,21 +527,22 @@ const BodyPreload = () => {
         
 }
 
-const Backdrop = (pizzazz) => {
+const Backdrop = ({ pizzazz }) => {
     if (!pizzazz.image) return null;
-    const image = useLoader(THREE.TextureLoader, pizzazz.image);
-    // how to use a gif as a texture
-
-
+    const image = useLoader(THREE.TextureLoader, pizzazz.image);    
 
     // repeat texture to avoid stretching
-    image.wrapS = THREE.RepeatWrapping;
-    image.wrapT = THREE.RepeatWrapping;
-    image.repeat.set( 4, 4 );
+    if (pizzazz.repeat) {
+        image.wrapS = THREE.RepeatWrapping;
+        image.wrapT = THREE.RepeatWrapping;    
+        image.repeat.set( pizzazz.repeat );    
+    }
+    
+    const yPosition = pizzazz.yPosition ? pizzazz.yPosition : 0;
 
     return (
-        <mesh position={[0,0,-30]}>
-            <planeGeometry attach="geometry" args={[100, 100]} />
+        <mesh position={[0,yPosition,-30]}>
+            <planeGeometry attach="geometry" args={[40, 20]} />
             <meshLambertMaterial transparent={ true } attach="material" map={image} />
         </mesh>
     )
@@ -1017,6 +1046,12 @@ const App = () => {
 
                                             <div key={ index } className='details'>
                                                 <h3>{ pizzazz.name }</h3>
+                                                <div className="details_body">
+                                                    <ul>
+                                                        { pizzazz.features.map((feature, index) => <li key={index}>{ feature }</li>) }
+                                                    </ul>
+                                                </div>
+
                                               
                                             </div>
                                         )
