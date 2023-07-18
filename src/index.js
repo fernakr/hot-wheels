@@ -174,7 +174,8 @@ const pizzazzes = [
         id: 'flame',
         name: 'Fire',
         image: flameBackdrop,
-        repeat: [3, 1],     
+        repeat: [2, 1],     
+        yPosition: 1,
         features: [
             'Hot'
         ]
@@ -183,7 +184,8 @@ const pizzazzes = [
         id: 'asteroid',
         name: 'Asteroid',
         image: asteroidBackdrop,
-        repeat: [1, 1],            
+        repeat: [1, 1],
+        yPosition: 4,            
         features: [
             'End of the world'
         ]
@@ -541,7 +543,7 @@ const Backdrop = ({ pizzazz }) => {
 
     return (
         <mesh position={[0,yPosition,-30]}>
-            <planeGeometry attach="geometry" args={[40, 20]} />
+            <planeGeometry attach="geometry" args={[60, 40]} />
             <meshLambertMaterial transparent={ true } attach="material" map={image} />
         </mesh>
     )
@@ -589,7 +591,10 @@ const Scene = ({ wheelColor, pizzazz, playHydraulic, status, setStatus, carPosit
 
 
     return (
-        <>            
+        <>          
+            <Suspense>           
+                <Backdrop pizzazz={ pizzazz }/>                                  
+            </Suspense>
             <Suspense fallback={<Loader />}>
                 <BodyPreload  />
                 <WheelPreload />
@@ -600,7 +605,7 @@ const Scene = ({ wheelColor, pizzazz, playHydraulic, status, setStatus, carPosit
                     scale={[52,52,52]} >
                     <Track/>
                 </group>      
-                <Backdrop pizzazz={ pizzazz }/>                                  
+                
                 <Ground stageColor={ stageColor } />
                 { status === 'inactive' && 
                     <Html>
