@@ -18,43 +18,15 @@ import hydraulicSfx from './hydraulic.mp3';
 import hatchSfx from './hatch.m4a';
 import spraySfx from './spray.m4a';
 
-// import {
-//     EmailShareButton,
-//     FacebookShareButton,
-//     // HatenaShareButton,
-//     // InstapaperShareButton,
-//     // LineShareButton,
-//     // LinkedinShareButton,
-//     // LivejournalShareButton,
-//     // MailruShareButton,
-//     // OKShareButton,
-//     // PinterestShareButton,
-//     // PocketShareButton,
-//     // RedditShareButton,
-//     // TelegramShareButton,
-//     // TumblrShareButton,
-//     // TwitterShareButton,
-//     // ViberShareButton,
-//     // VKShareButton,
-//     // WhatsappShareButton,
-//     // WorkplaceShareButton
-//   } from "react-share";
-  
-
-
-//import { VRButton, ARButton, XR, Controllers, Hands, Interactive } from '@react-three/xr'
-//import { Canvas } from '@react-three/fiber'
-
+import sparkle from './assets/images/sparkle.gif';
 
 
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { PlaneGeometry } from 'three/src/geometries/PlaneGeometry.js';
 import { CylinderGeometry } from 'three/src/geometries/CylinderGeometry.js';
-import { BoxGeometry } from 'three/src/geometries/BoxGeometry.js';
+//import { BoxGeometry } from 'three/src/geometries/BoxGeometry.js';
 
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
-
-//import font from 'three/examples/fonts/helvetiker_regular.typeface.json'
 
 import { Canvas, useFrame, useLoader, extend, useThree } from '@react-three/fiber'
 import { OrbitControls, Html, useAnimations, useGLTF, Preload } from '@react-three/drei'
@@ -183,6 +155,11 @@ const pizzazzes = [
     {
         id: 'none',
         name: 'None',
+    },
+    {
+        id: 'sparkle',
+        name: 'Sparkle',
+        image: sparkle
     }
 ]
 
@@ -205,17 +182,13 @@ const Logo = ({ status, logoColor, logoColor2, stageColor }) => {
 
     let darkMode = checkColor(stageColor);
 
-    // set document body class
     
     if (!darkMode) {
         document.body.classList.add('is-light');
     }else{
         document.body.classList.remove('is-light');
     }
-    // if (checkColor(stageColor)) {
-    //     darkMode = true;
-    // }
-
+    
     const textOutput = [
         {
             text: 'The',
@@ -526,6 +499,26 @@ const BodyPreload = () => {
         
 }
 
+const Backdrop = (pizzazz) => {
+    if (!pizzazz.image) return null;
+    const image = useLoader(THREE.TextureLoader, pizzazz.image);
+    // how to use a gif as a texture
+
+
+
+    // repeat texture to avoid stretching
+    image.wrapS = THREE.RepeatWrapping;
+    image.wrapT = THREE.RepeatWrapping;
+    image.repeat.set( 4, 4 );
+
+    return (
+        <mesh position={[0,0,-30]}>
+            <planeGeometry attach="geometry" args={[100, 100]} />
+            <meshLambertMaterial transparent={ true } attach="material" map={image} />
+        </mesh>
+    )
+}
+
 const WheelPreload = () => {    
     return wheels.map((wheel, i) => { 
              
@@ -558,7 +551,7 @@ const Track = () => {
   }
   
 
-const Scene = ({ wheelColor, playHydraulic, status, setStatus, carPosition, body, bodyColor, wheel, stageColor, baseColor, logoColor, logoColor2 }) => {
+const Scene = ({ wheelColor, pizzazz, playHydraulic, status, setStatus, carPosition, body, bodyColor, wheel, stageColor, baseColor, logoColor, logoColor2 }) => {
 
     
     useFrame(() => {
@@ -578,7 +571,8 @@ const Scene = ({ wheelColor, playHydraulic, status, setStatus, carPosition, body
                     rotation={[0,Math.PI/3,0]}
                     scale={[52,52,52]} >
                     <Track/>
-                </group>                                        
+                </group>      
+                <Backdrop pizzazz={ pizzazz }/>                                  
                 <Ground stageColor={ stageColor } />
                 { status === 'inactive' && 
                     <Html>
@@ -1068,7 +1062,7 @@ const App = () => {
             {/* <XR> */}
                 {/* <Hands/>
                 <Controllers/> */}
-                <Scene wheelColor={ wheelColor } playHydraulic={ playHydraulic } logoColor={ logoColor } logoColor2={ logoColor2} body={ body } bodyColor={ bodyColor } wheel={ wheel } pizzazz={ pizzazz} status={ status } setStatus={ setStatus }  carPosition={ carPosition } stageColor={stageColor} baseColor={ baseColor }/>
+                <Scene pizzazz={ pizzazz } wheelColor={ wheelColor } playHydraulic={ playHydraulic } logoColor={ logoColor } logoColor2={ logoColor2} body={ body } bodyColor={ bodyColor } wheel={ wheel } pizzazz={ pizzazz} status={ status } setStatus={ setStatus }  carPosition={ carPosition } stageColor={stageColor} baseColor={ baseColor }/>
 
                 {/* <EffectComposer>
 
