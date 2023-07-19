@@ -31,6 +31,7 @@ import HotWheels from './assets/models/Hotwheels';
 import WheelDefault from './assets/models/wheels/default/Wheel';
 import WheelOrange from './assets/models/wheels/orange/Wheel';
 import WheelBlob from './assets/models/wheels/blob/Wheel';
+import Track from './assets/models/Track';
 
 import sparkleBackdrop from './assets/images/sparkle.gif';
 import flameBackdrop from './assets/images/fire.png';
@@ -586,22 +587,6 @@ const WheelPreload = () => {
         })
     })
 
-}
-
-const Track = () => {
-
-    const group = useRef();
-
-    const { scene, animations } = useGLTF("./assets/models/track.gltf", true);
-    const { actions, mixer } = useAnimations(animations, group);
-
-    useEffect(() => {
-        //console.log(actions);
-        actions['Chomper_Tooth (6).003_RotatingObstacletest_0Action'].play();
-        actions['Sketchfab_model.001Action'].play();
-    }, [mixer]);
-
-    return <primitive ref={group} object={scene} dispose={null} />;
 }
 
 
