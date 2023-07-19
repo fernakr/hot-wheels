@@ -154,6 +154,16 @@ const bodies = [
         features: [
             'Has a belly button',
         ]
+    },
+    {
+        id: 'cheeto',
+        name: 'Bag of Cheetos',
+        speed: 6,
+        agility: 4,
+        specialMove: 'Cheese dust',
+        features: [
+            'Addictive'
+        ]
     }
 ];
 
