@@ -36,6 +36,7 @@ import sparkleBackdrop from './assets/images/sparkle.gif';
 import flameBackdrop from './assets/images/fire.png';
 import asteroidBackdrop from './assets/images/asteroid.png';
 import hebBackdrop from './assets/images/heb.png';
+import ufoBackdrop from './assets/images/ufo.png';
 
 import hotwheelsFont from './flash_rogers.typeface.json';
 
@@ -192,6 +193,16 @@ const pizzazzes = [
         yPosition: 1,
         features: [
             'Hot'
+        ]
+    },
+    {
+        id: 'ufo',
+        name: 'Aliens',
+        image: ufoBackdrop,
+        repeat: [1, 1],
+        yPosition: 1,
+        features: [
+            'Out of this world'
         ]
     },
     {
