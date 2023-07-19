@@ -705,14 +705,6 @@ const EyeAnimation = ({ status, carPosition }) => {
     targetPosition[1] = targetPosition[1] + 12;
     targetPosition[2] = targetPosition[2] - 7;
 
-    // targetPosition[0] = targetPosition[0];
-    // targetPosition[1] = targetPosition[1] + 14;
-    // targetPosition[2] = targetPosition[2] -7;
-
-
-
-
-
     let buildCameraPos = {
         position: [5, 0, 2],
         target: targetPosition
@@ -756,12 +748,23 @@ const EyeAnimation = ({ status, carPosition }) => {
     }, [status]);
 
     return (
-    
-        <AnimateEyeToTarget
+        <>
+         <OrbitControls makeDefault
+                    enablePan={false}
+                    enableZoom={status === 'staging'}
+                    minDistance={3}
+                    maxDistance={20}
+                    minPolarAngle={-Math.PI / 8}
+                    maxPolarAngle={Math.PI / 2 + Math.PI / 20}
+
+                />
+            <AnimateEyeToTarget
 
             position={cameraSettings.position}
             target={cameraSettings.target}
-        />
+            />
+
+        </>
     
     );
 }
@@ -913,6 +916,41 @@ const App = () => {
     //const pizzazzIndex = ;
     return (
         <>
+
+
+
+
+            <Canvas 
+                gl={{ preserveDrawingBuffer: true }}
+                onCreated={({ gl }) => {
+                    glInstance = gl;
+                }}
+            >
+                <color attach="background" args={[stageColor]} />
+               
+                <EyeAnimation 
+                    status={status} 
+                    carPosition={carPosition} />
+
+
+                
+                <Scene 
+                    pizzazz={pizzazz} 
+                    wheelColor={wheelColor} 
+                    playTrack={ playTrack }
+                    playHydraulic={playHydraulic} 
+                    logoColor={logoColor} 
+                    logoColor2={logoColor2} 
+                    body={body} 
+                    bodyColor={bodyColor} 
+                    wheel={wheel} 
+                    status={status} 
+                    setStatus={setStatus} 
+                    carPosition={carPosition} 
+                    stageColor={stageColor} 
+                    baseColor={baseColor} />
+
+            </Canvas>
 
             {status !== 'inactive' && <button className='start-over button' onClick={() => {
                 setStatus('inactive');
@@ -1066,48 +1104,6 @@ const App = () => {
 
                 <button style={{ marginTop: '20px' }} className="button" onClick={() => { setTimeout(() => playHydraulic(), 500); setStatus('staging') }}>Ready for Photos! 🔥</button>
             </div>
-
-
-
-            <Canvas 
-                gl={{ preserveDrawingBuffer: true }}
-                onCreated={({ gl }) => {
-                    glInstance = gl;
-                }}
-            >
-                <color attach="background" args={[stageColor]} />
-                <OrbitControls makeDefault
-                    enablePan={false}
-                    enableZoom={status === 'staging'}
-                    minDistance={3}
-                    maxDistance={20}
-                    minPolarAngle={-Math.PI / 8}
-                    maxPolarAngle={Math.PI / 2 + Math.PI / 20}
-
-                />
-                <EyeAnimation 
-                    status={status} 
-                    carPosition={carPosition} />
-
-
-                
-                <Scene 
-                    pizzazz={pizzazz} 
-                    wheelColor={wheelColor} 
-                    playTrack={ playTrack }
-                    playHydraulic={playHydraulic} 
-                    logoColor={logoColor} 
-                    logoColor2={logoColor2} 
-                    body={body} 
-                    bodyColor={bodyColor} 
-                    wheel={wheel} 
-                    status={status} 
-                    setStatus={setStatus} 
-                    carPosition={carPosition} 
-                    stageColor={stageColor} 
-                    baseColor={baseColor} />
-
-            </Canvas>
         </>
     )
 
