@@ -677,6 +677,7 @@ const CameraWrapper = ({ cameraPosition, target }) => {
 
 const ControlsWrapper = ({ target }) => {
     const { controls } = useThree();
+    
     if (controls) {
         controls.target.set(...target);
     }
@@ -767,18 +768,11 @@ const EyeAnimation = ({ status, carPosition }) => {
             setCameraSettings(inactiveCameraPos);
         }
     }, [status]);
+    
 
     return (
         <>
-         <OrbitControls makeDefault
-                    enablePan={false}
-                    enableZoom={status === 'staging'}
-                    minDistance={3}
-                    maxDistance={20}
-                    minPolarAngle={-Math.PI / 8}
-                    maxPolarAngle={Math.PI / 2 + Math.PI / 20}
-
-                />
+               
             <AnimateEyeToTarget
 
             position={cameraSettings.position}
@@ -793,6 +787,7 @@ const EyeAnimation = ({ status, carPosition }) => {
 let glInstance;
 
 const App = () => {
+    const cameraRef = useRef()
     const [activePanel, setActivePanel] = useState(0);
     const [status, setStatus] = useState('inactive');
 
@@ -941,6 +936,12 @@ const App = () => {
         setShareImage(null);
     }
 
+    const resetEmail = () => {
+        cameraRef.current.reset();
+        setEmail(null);
+        setEmailStatus(false);        
+    }
+
 
     // useEffect (() => {
     //     return new THREE.Color(stageColor);
@@ -960,6 +961,16 @@ const App = () => {
                     glInstance = gl;
                 }}
             >
+                <OrbitControls  
+                ref={cameraRef}                  
+                    makeDefault
+                    enablePan={false}                    
+                    minDistance={3}
+                    maxDistance={20}
+                    minPolarAngle={-Math.PI / 8}
+                    maxPolarAngle={Math.PI / 2 + Math.PI / 20}
+
+                />
                 <color attach="background" args={[stageColor]} />
                
                 <EyeAnimation 
@@ -969,6 +980,7 @@ const App = () => {
 
                 
                 <Scene 
+                
                     pizzazz={pizzazz} 
                     wheelColor={wheelColor} 
                     playTrack={ playTrack }
@@ -1006,19 +1018,19 @@ const App = () => {
                                         <form>
                                             <input type="email" placeholder="email@domain.com" onChange={ e => setEmail(e.target.value)}/>
                                             <button type="submit" className="button" onClick={ e => sendPhoto(e)}>Send photo to email 📧</button>
-                                            <button className="button never-mind secondary" onClick={() => {setEmailStatus(false); setEmail(null);}}>Never mind, go back</button>
+                                            <button className="button never-mind secondary" onClick={() => {resetEmail()}}>Never mind, go back</button>
                                         </form>
                                     }   
                                     { emailStatus === 'success' &&
                                         <div>
                                             <p>Your photo has been sent to { email }! Check your email.</p>
-                                            <button className="button secondary" onClick={() => { setEmailStatus(false); exitImage(); setEmail(null);  }}>Close</button>
+                                            <button className="button secondary" onClick={() => { resetEmail(); exitImage();}}>Close</button>
                                         </div>
                                     }
                                     { emailStatus === 'error' &&
                                         <div>
                                             <p>There was an error sending your email. Please try again.</p>
-                                            <button className="button secondary" onClick={() => { setEmailStatus(false); setEmail(null);  }}>Close</button>
+                                            <button className="button secondary" onClick={() => { resetEmail();  }}>Close</button>
                                     </div>
                                     }
                                 </div>
@@ -1038,6 +1050,7 @@ const App = () => {
                                 Download image ⬇️
                             </button>
                             <button className="button" onClick={() => {
+                                
                                 setEmailStatus('active');
                             }}>Send Photo to Email 📧</button>
                         </div>
@@ -1166,7 +1179,7 @@ const App = () => {
                 </div>
 
 
-                <button style={{ marginTop: '20px' }} className="button" onClick={() => { setTimeout(() => playHydraulic(), 500); setStatus('staging') }}>Ready for Photos! 🔥</button>
+                <button style={{ marginTop: '20px' }} className="button" onClick={() => { setTimeout(() => playHydraulic(), 500);  setStatus('staging'); cameraRef.current.reset(); }}>Ready for Photos! 🔥</button>
             </div>
         </>
     )
