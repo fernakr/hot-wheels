@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "./static/css/main.a20c9df6.css",
-    "main.js": "./static/js/main.58aa13dc.js",
+    "main.css": "./static/css/main.4496308a.css",
+    "main.js": "./static/js/main.de635c5f.js",
     "static/js/845.5be44460.chunk.js": "./static/js/845.5be44460.chunk.js",
     "static/media/track.mp3": "./static/media/track.bb0689a2d6b6bc85b7d8.mp3",
     "static/media/heb.png": "./static/media/heb.2e992aabac9a0b0785ed.png",
@@ -15,12 +15,12 @@
     "static/media/AUdimat-Bold.ttf": "./static/media/AUdimat-Bold.7b0e503b5a9753014b3d.ttf",
     "static/media/spray.m4a": "./static/media/spray.4bed552eba37edb8f650.m4a",
     "index.html": "./index.html",
-    "main.a20c9df6.css.map": "./static/css/main.a20c9df6.css.map",
-    "main.58aa13dc.js.map": "./static/js/main.58aa13dc.js.map",
+    "main.4496308a.css.map": "./static/css/main.4496308a.css.map",
+    "main.de635c5f.js.map": "./static/js/main.de635c5f.js.map",
     "845.5be44460.chunk.js.map": "./static/js/845.5be44460.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.a20c9df6.css",
-    "static/js/main.58aa13dc.js"
+    "static/css/main.4496308a.css",
+    "static/js/main.de635c5f.js"
   ]
 }
