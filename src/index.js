@@ -310,7 +310,7 @@ const Logo = ({ status, logoColor, logoColor2, stageColor }) => {
 
 
     const springLogo = useSpring({
-        position: status === 'inactive' ? inactiveLogoPosition : (status === 'staging' ? logoStagingPosition : logoPosition),
+        position: status === 'inactive' || status === 'idle' ? inactiveLogoPosition : (status === 'staging' ? logoStagingPosition : logoPosition),
         rotation: status === 'staging' ? [0, Math.PI / 15, 0] : [Math.PI / 20, 0, 0],
         config: { duration: 1000, tension: 30, friction: 20 }
 
@@ -531,7 +531,7 @@ const Configurator = ({ status, carPosition, body, bodyColor, wheel, baseColor, 
 
     const { position, rotation } = useSpring(
         {
-            position: status !== 'inactive' ? startCarPosition : carPosition, rotation: status !== 'inactive' ? [0, Math.PI / 20, 0] : [0, - Math.PI / 9, 0],
+            position: status !== 'inactive' && status !== 'idle' ? startCarPosition : carPosition, rotation: status !== 'inactive' && status !== 'idle' ? [0, Math.PI / 20, 0] : [0, - Math.PI / 9, 0],
             config: { duration: 4000, tension: 300, friction: 20 }, // Set the duration to 1000 milliseconds (1 second)
         })
 
@@ -630,7 +630,7 @@ const Scene = ({ wheelColor, playTrack,  pizzazz, playHydraulic, status, setStat
                 </group>
 
                 <Ground stageColor={stageColor} />
-                {status === 'inactive' &&
+                {status === 'inactive' || status === 'idle' &&
                     <Html>
                         <button className="button" onClick={() => { setTimeout(() => playHydraulic(), 500); playTrack(); setStatus('active') }}>Build a Car 🔧</button>
                     </Html>
@@ -641,8 +641,8 @@ const Scene = ({ wheelColor, playTrack,  pizzazz, playHydraulic, status, setStat
 
             <pointLight position={[-10, 10, -10]} radius={10} intensity={0.5} castShadow />
             <pointLight position={[15, 0, 10]} intensity={1} castShadow />
-            <spotLight position={[10, 0, -15]} intensity={status === 'inactive' ? 0 : 0.5} castShadow />
-            <ambientLight intensity={status === 'inactive' ? 0.3 : 0} castShadow />
+            <spotLight position={[10, 0, -15]} intensity={status === 'inactive' || status === 'idle' ? 0 : 0.5} castShadow />
+            <ambientLight intensity={status === 'inactive' || status === 'idle' ? 0.3 : 0} castShadow />
             <Logo stageColor={stageColor} status={status} logoColor={logoColor} logoColor2={logoColor2} />
 
         </>
@@ -762,7 +762,7 @@ const EyeAnimation = ({ status, carPosition }) => {
         // switch statement
         if (status === 'staging') {
             setCameraSettings(stagingCameraPos);
-        } else if (status !== 'inactive') {
+        } else if (status !== 'inactive' && status !== 'idle') {
             setCameraSettings(buildCameraPos);
         } else {
             setCameraSettings(inactiveCameraPos);
@@ -847,19 +847,20 @@ const App = () => {
     // what is 5 mintues in milliseconds?
     const inactiveThreshold = 300000;
 
-    let timer = setTimeout(() => setStatus('inactive'), inactiveThreshold);
+    let timer = setTimeout(() => reset(true), inactiveThreshold);
 
     // on mouse move reset timer
     document.addEventListener('mousemove', () => {
         clearTimeout(timer);
         timer = setTimeout(() => {            
-            reset();
+
+            reset(true);
 
         }, inactiveThreshold);
     });
 
-    const reset = () => {
-        setStatus('inactive');
+    const reset = (idle) => {
+        setStatus(idle ? 'idle' : 'inactive');
         setEmail(null);
         setEmailStatus(false);    
         setBody(defaultBody);
@@ -962,7 +963,8 @@ const App = () => {
                 }}
             >
                 <OrbitControls  
-                ref={cameraRef}                  
+                    ref={cameraRef}          
+                    autoRotate={ status === 'idle'}        
                     makeDefault
                     enablePan={false}                    
                     minDistance={3}
@@ -998,7 +1000,7 @@ const App = () => {
 
             </Canvas>
 
-            {status !== 'inactive' && <button className='start-over bright button' onClick={() => {
+            {status !== 'inactive' && status !== 'idle' && <button className='start-over bright button' onClick={() => {
 
                 reset();
             }}>Start over 🔁</button>}
