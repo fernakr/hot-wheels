@@ -630,7 +630,7 @@ const Scene = ({ wheelColor, playTrack,  pizzazz, playHydraulic, status, setStat
                 </group>
 
                 <Ground stageColor={stageColor} />
-                {status === 'inactive' || status === 'idle' &&
+                {(status === 'inactive' || status === 'idle') &&
                     <Html position={[0,0,0]}>
                         <button className="button" onClick={() => { setTimeout(() => playHydraulic(), 500); playTrack(); setStatus('active') }}>Build a Car 🔧</button>
                     </Html>
@@ -641,8 +641,8 @@ const Scene = ({ wheelColor, playTrack,  pizzazz, playHydraulic, status, setStat
 
             <pointLight position={[-10, 10, -10]} radius={10} intensity={0.5} castShadow />
             <pointLight position={[15, 0, 10]} intensity={1} castShadow />
-            <spotLight position={[10, 0, -15]} intensity={status === 'inactive' || status === 'idle' ? 0 : 0.5} castShadow />
-            <ambientLight intensity={status === 'inactive' || status === 'idle' ? 0.3 : 0} castShadow />
+            <spotLight position={[10, 0, -15]} intensity={(status === 'inactive' || status === 'idle') ? 0 : 0.5} castShadow />
+            <ambientLight intensity={(status === 'inactive' || status === 'idle') ? 0.3 : 0} castShadow />
             <Logo stageColor={stageColor} status={status} logoColor={logoColor} logoColor2={logoColor2} />
 
         </>
@@ -963,7 +963,7 @@ const App = () => {
             >
                 <OrbitControls  
                     ref={cameraRef}          
-                    autoRotate={status === 'inactive' || status === 'idle'}        
+                    autoRotate={ status === 'idle'}        
                     makeDefault
                     enablePan={false}                    
                     minDistance={3}
@@ -1001,7 +1001,7 @@ const App = () => {
 
             {status !== 'inactive' && status !== 'idle' && <button className='start-over bright button' onClick={() => {
 
-                reset();
+                reset(false);
             }}>Start over 🔁</button>}
             {shareImage &&
                 <div className="image_wrapper">
