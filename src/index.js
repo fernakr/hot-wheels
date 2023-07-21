@@ -631,7 +631,7 @@ const Scene = ({ wheelColor, playTrack,  pizzazz, playHydraulic, status, setStat
 
                 <Ground stageColor={stageColor} />
                 {status === 'inactive' || status === 'idle' &&
-                    <Html>
+                    <Html position={[0,0,0]}>
                         <button className="button" onClick={() => { setTimeout(() => playHydraulic(), 500); playTrack(); setStatus('active') }}>Build a Car 🔧</button>
                     </Html>
                 }
@@ -789,7 +789,7 @@ let glInstance;
 const App = () => {
     const cameraRef = useRef()
     const [activePanel, setActivePanel] = useState(0);
-    const [status, setStatus] = useState('idle');
+    const [status, setStatus] = useState('inactive');
 
     const defaultBody = bodies[0];
     const [body, setBody] = useState(defaultBody);
@@ -859,7 +859,7 @@ const App = () => {
         }, inactiveThreshold);
     });
 
-    const reset = (idle) => {
+    const reset = (idle = false) => {
         setStatus(idle ? 'idle' : 'inactive');
         setEmail(null);
         setEmailStatus(false);    
@@ -873,6 +873,7 @@ const App = () => {
         setLogoColor(defaultLogoColor);
         setLogoColor2(defaultLogoColor2);
         setShareImage(null);
+        cameraRef.current.reset();
 
     }
 
