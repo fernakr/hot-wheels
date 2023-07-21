@@ -789,7 +789,7 @@ let glInstance;
 const App = () => {
     const cameraRef = useRef()
     const [activePanel, setActivePanel] = useState(0);
-    const [status, setStatus] = useState('inactive');
+    const [status, setStatus] = useState('idle');
 
     const defaultBody = bodies[0];
     const [body, setBody] = useState(defaultBody);
@@ -901,9 +901,7 @@ const App = () => {
     }
 
     const sendPhoto = (e) => {        
-        e.preventDefault();
-        //const email = prompt('Please enter your email address to receive your photo');
-
+        e.preventDefault();        
         // validate email
         const emailRegex = /\S+@\S+\.\S+/;
         if (!emailRegex.test(email)) {
@@ -964,7 +962,7 @@ const App = () => {
             >
                 <OrbitControls  
                     ref={cameraRef}          
-                    autoRotate={ status === 'idle'}        
+                    autoRotate={status === 'inactive' || status === 'idle'}        
                     makeDefault
                     enablePan={false}                    
                     minDistance={3}
