@@ -231,7 +231,8 @@ html {
         left: 5%;        
         transform: translate(0, 200%);
         max-height: calc(100vh - 30px);
-        overflow: scroll;
+        overflow-y: auto;
+		overflow-x: hidden;
         padding: 50px 0;
         
         @include mobile{
