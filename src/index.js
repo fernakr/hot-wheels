@@ -1006,7 +1006,8 @@ const App = () => {
                                     { emailStatus === 'active' &&
                                         <form>
                                             <input type="email" placeholder="email@domain.com" onChange={ e => setEmail(e.target.value)}/>
-                                            <button type="submit" className="button secondary" onClick={ e => sendPhoto(e)}>Send photo to email 📧</button>
+                                            <button type="submit" className="button" onClick={ e => sendPhoto(e)}>Send photo to email 📧</button>
+                                            <button className="button never-mind secondary" onClick={() => {setEmailStatus(false); setEmail(null);}}>Never mind, go back</button>
                                         </form>
                                     }   
                                     { emailStatus === 'success' &&
