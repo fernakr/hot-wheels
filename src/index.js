@@ -829,6 +829,9 @@ const App = () => {
 
     const [shareImage, setShareImage] = useState(null);
 
+    const [emailStatus, setEmailStatus] = useState(false);
+    const [email, setEmail] = useState(null);
+
     const panels = [
         {
             id: 'body',
@@ -854,14 +857,16 @@ const App = () => {
     // on mouse move reset timer
     document.addEventListener('mousemove', () => {
         clearTimeout(timer);
-        timer = setTimeout(() => {
-            setStatus('inactive');
+        timer = setTimeout(() => {            
             reset();
 
         }, inactiveThreshold);
     });
 
     const reset = () => {
+        setStatus('inactive');
+        setEmail(null);
+        setEmailStatus(false);    
         setBody(defaultBody);
         setWheel(defaultWheel);
         setWheelColor(defaultWheelColor);
@@ -899,13 +904,19 @@ const App = () => {
         setWheelColor(getRandomColor());
     }
 
-    const sendPhoto = () => {
-        //        const image = shareImage;
-        // shareImage to base64 encoding
+    const sendPhoto = (e) => {        
+        e.preventDefault();
+        //const email = prompt('Please enter your email address to receive your photo');
 
-        //console.log(shareImage);
-        // const email = 'verticallychallenged@gmail.com';
-        const email = prompt('Please enter your email address to receive your photo');
+        // validate email
+        const emailRegex = /\S+@\S+\.\S+/;
+        if (!emailRegex.test(email)) {
+            alert('Please enter a valid email address');
+            setEmail(null);
+            return;
+        }
+
+        setEmailStatus('sending');
         if (email) {
             fetch(process.env.REACT_APP_API_URL, {
                 method: 'POST',
@@ -914,10 +925,13 @@ const App = () => {
                 },
                 body: JSON.stringify({ email, image: shareImage })
             }).then((response) => {
+                setEmail(null); 
                 if (response.status === 200) {
-                    alert('Your photo has been sent! Check your email.');
+                    setEmailStatus('success');
+                    //alert('Your photo has been sent! Check your email.');
                 } else {
-                    alert('There was an error sending your photo. Please try again.');
+                    setEmailStatus('error');
+                    //alert('There was an error sending your photo. Please try again.');
                 }
             });
         }
@@ -973,15 +987,44 @@ const App = () => {
 
             </Canvas>
 
-            {status !== 'inactive' && <button className='start-over button' onClick={() => {
-                setStatus('inactive');
+            {status !== 'inactive' && <button className='start-over bright button' onClick={() => {
+
                 reset();
             }}>Start over 🔁</button>}
             {shareImage &&
                 <div className="image_wrapper">
                     <div className="image_overlay" onClick={() => setShareImage(null)}></div>
                     <div className='image'>
-                        <img src={shareImage} />
+                        <div className="image_inner">
+                            { emailStatus && 
+                                <div className="image_inner_overlay">
+                                    { emailStatus === 'sending' &&
+                                        <div className="sending">
+                                            <p>Sending your email... Wait a few seconds.</p>
+                                        </div>
+                                    }
+                                    { emailStatus === 'active' &&
+                                        <>
+                                            <input type="email" placeholder="email@domain.com" onChange={ e => setEmail(e.target.value)}/>
+                                            <button type="submit" className="button secondary" onClick={ e => sendPhoto(e)}>Send photo</button>
+                                        </>
+                                    }   
+                                    { emailStatus === 'success' &&
+                                        <div>
+                                            <p>Your photo has been sent! Check your email.</p>
+                                            <button className="button secondary" onClick={() => { setEmailStatus(false); exitImage(); }}>Close</button>
+                                        </div>
+                                    }
+                                    { emailStatus === 'error' &&
+                                        <div>
+                                            <p>There was an error sending your email. Please try again.</p>
+                                            <button className="button secondary" onClick={() => { setEmailStatus(false); }}>Close</button>
+                                    </div>
+                                    }
+                                </div>
+                            }
+                            <img src={shareImage} />
+                        </div>
                         <div className="image_options">
 
                             <button className="button secondary" onClick={() => {
@@ -995,8 +1038,8 @@ const App = () => {
                                 Download image ⬇️
                             </button>
                             <button className="button" onClick={() => {
-                                sendPhoto();
-                            }}>Send Picture to Email 📧</button>
+                                setEmailStatus('active');
+                            }}>Send Photo to Email 📧</button>
                         </div>
                     </div>
                 </div>
@@ -1004,7 +1047,7 @@ const App = () => {
             {status === 'staging' &&
 
                 <div className="staging">
-                    {/* Take a picture  */}
+                    {/* Take a Photo  */}
                     {!shareImage && <button className="button" onClick={() => {
                         // output canvas and set image as open graph image for the page
                         const canvas = glInstance.domElement;
@@ -1013,9 +1056,9 @@ const App = () => {
 
                         setShareImage(image);
 
-                    }}>Take a Picture 📷</button>
+                    }}>Take a Photo 📷</button>
                     }
-                    {shareImage && <button className="button" onClick={() => { exitImage(); }}>Retake Picture 👈</button>}
+                    {shareImage && <button className="button" onClick={() => { exitImage(); }}>Retake Photo 👈</button>}
                     { /* Share on social media */}
 
                     {/* Back to build */}
