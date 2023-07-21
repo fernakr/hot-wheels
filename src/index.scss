@@ -125,13 +125,19 @@ html {
 			font-family: $font-family_1;
 			font-size: 36px;
 			//-webkit-backdrop-filter: blur(30px);				
+			form{
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+				width: 80%;
+			}
 			p{
 				margin-bottom: 15px;
 			}
 			input{
 				font-size: 24px;
 				padding: 10px;
-				width: 80%;
+				//width: 80%;
 				color: navy;
 				&::placeholder{
 					opacity: 0.6;

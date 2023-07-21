@@ -1004,10 +1004,10 @@ const App = () => {
                                         </div>
                                     }
                                     { emailStatus === 'active' &&
-                                        <>
+                                        <form>
                                             <input type="email" placeholder="email@domain.com" onChange={ e => setEmail(e.target.value)}/>
-                                            <button type="submit" className="button secondary" onClick={ e => sendPhoto(e)}>Send photo</button>
-                                        </>
+                                            <button type="submit" className="button secondary" onClick={ e => sendPhoto(e)}>Send photo to email 📧</button>
+                                        </form>
                                     }   
                                     { emailStatus === 'success' &&
                                         <div>
