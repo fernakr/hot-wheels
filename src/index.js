@@ -924,8 +924,7 @@ const App = () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ email, image: shareImage })
-            }).then((response) => {
-                setEmail(null); 
+            }).then((response) => {                
                 if (response.status === 200) {
                     setEmailStatus('success');
                     //alert('Your photo has been sent! Check your email.');
@@ -1012,14 +1011,14 @@ const App = () => {
                                     }   
                                     { emailStatus === 'success' &&
                                         <div>
-                                            <p>Your photo has been sent! Check your email.</p>
-                                            <button className="button secondary" onClick={() => { setEmailStatus(false); exitImage(); }}>Close</button>
+                                            <p>Your photo has been sent to { email }! Check your email.</p>
+                                            <button className="button secondary" onClick={() => { setEmailStatus(false); exitImage(); setEmail(null);  }}>Close</button>
                                         </div>
                                     }
                                     { emailStatus === 'error' &&
                                         <div>
                                             <p>There was an error sending your email. Please try again.</p>
-                                            <button className="button secondary" onClick={() => { setEmailStatus(false); }}>Close</button>
+                                            <button className="button secondary" onClick={() => { setEmailStatus(false); setEmail(null);  }}>Close</button>
                                     </div>
                                     }
                                 </div>
