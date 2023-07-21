@@ -846,6 +846,7 @@ const App = () => {
     // set timer for 5 minutes of inactivity
     // what is 5 mintues in milliseconds?
     const inactiveThreshold = 300000;
+    //const inactiveThreshold = 300;
 
     let timer = setTimeout(() => reset(true), inactiveThreshold);
 
@@ -873,7 +874,7 @@ const App = () => {
         setLogoColor(defaultLogoColor);
         setLogoColor2(defaultLogoColor2);
         setShareImage(null);
-        cameraRef.current.reset();
+        //if (cameraRef) cameraRef.current.reset();
 
     }
 
@@ -1180,7 +1181,7 @@ const App = () => {
                 </div>
 
 
-                <button style={{ marginTop: '20px' }} className="button" onClick={() => { setTimeout(() => playHydraulic(), 500);  setStatus('staging'); cameraRef.current.reset(); }}>Ready for Photos! 🔥</button>
+                <button style={{ marginTop: '20px' }} className="button" onClick={() => { setTimeout(() => playHydraulic(), 500);  setStatus('staging'); if (cameraRef) cameraRef.current.reset(); }}>Ready for Photos! 🔥</button>
             </div>
         </>
     )
