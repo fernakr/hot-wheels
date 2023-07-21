@@ -937,7 +937,7 @@ const App = () => {
     }
 
     const resetEmail = () => {
-        cameraRef.current.reset();
+        if (cameraRef) cameraRef.current.reset();
         setEmail(null);
         setEmailStatus(false);        
     }
