@@ -1009,7 +1009,7 @@ const App = () => {
                     <div className="image_overlay" onClick={() => setShareImage(null)}></div>
                     <div className='image'>
                         <div className="image_inner">
-                            { emailStatus && 
+                            {/* { emailStatus && 
                                 <div className="image_inner_overlay">
                                     { emailStatus === 'sending' &&
                                         <div className="sending">
@@ -1036,10 +1036,10 @@ const App = () => {
                                     </div>
                                     }
                                 </div>
-                            }
+                            } */}
                             <img src={shareImage} />
                         </div>
-                        <div className="image_options">
+                        {/* <div className="image_options">
 
                             <button className="button secondary" onClick={() => {
                                 const link = document.createElement('a');
@@ -1055,7 +1055,7 @@ const App = () => {
                                 
                                 setEmailStatus('active');
                             }}>Send Photo to Email 📧</button>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             }
