@@ -581,7 +581,7 @@ const WheelPreload = () => {
             wheelTypes = wheelTypes.concat('-front');
         }
 
-        return wheelTypes.map((wheelType, i) => {
+        if (!wheel.model) return wheelTypes.map((wheelType, i) => {
             useGLTF.preload(`./assets/models/wheels/${wheel.id}/wheels${wheelType}.gltf`)
         })
     })
